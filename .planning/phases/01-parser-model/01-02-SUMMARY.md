@@ -72,7 +72,7 @@ Each TDD stage was committed atomically:
 2. **Task 2 (GREEN): implement tokenizer** — `ac0cb6a` (feat)
 3. **Task 3 (REFACTOR): harden tokenizer edge cases** — `bdf7c70` (refactor)
 
-**Plan metadata:** (final docs commit — see below)
+**Plan metadata:** `c45d0f3` (docs) — SUMMARY.md + STATE.md + ROADMAP.md + REQUIREMENTS.md
 
 ## Files Created/Modified
 
