@@ -83,7 +83,7 @@ Each task was committed atomically:
 2. **Task 2: Write hand-written edge-case fixtures** - `85a4b98` (test)
 3. **Task 3: Hermetic loader + smoke test** - `d0f1736` (test)
 
-**Plan metadata:** pending (docs: complete plan)
+**Plan metadata:** `7faae3c` (docs: complete plan)
 
 ## Files Created/Modified
 - `packages/parser/test/fixtures/real/HPP_Main_Building_2.std` - 92518-byte byte-identical copy of the real STAAD.Pro ground-truth file
