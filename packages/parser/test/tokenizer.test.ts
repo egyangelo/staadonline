@@ -100,3 +100,71 @@ describe('tokenize token shape', () => {
     expect(entry.tokens[0].text).toBe('1');
   });
 });
+
+describe('tokenize tolerance hardening (edge cases)', () => {
+  it('closes an unterminated quote at end of line without throwing', () => {
+    const out = tokenize("'EUROPE (EN 2023 1 2");
+    expect(out).toHaveLength(1);
+    // The quote region extends to end of line: everything after the opening
+    // quote becomes one quoted token; the trailing content is not re-split.
+    expect(out[0].tokens).toEqual([{ text: 'EUROPE (EN 2023 1 2', quoted: true }]);
+  });
+
+  it('treats a lone "-" mid-entry as data, not a continuation', () => {
+    const out = tokenize('1 - 2');
+    expect(out).toHaveLength(1);
+    expect(texts(out)).toEqual([['1', '-', '2']]);
+  });
+
+  it('treats a "-" not in final position as data even at end of a member list', () => {
+    const out = tokenize('1 TO 7 - 8');
+    expect(out).toHaveLength(1);
+    expect(texts(out)).toEqual([['1', 'TO', '7', '-', '8']]);
+  });
+
+  it('treats negative numbers as data, not continuations', () => {
+    const out = tokenize('-2.8 -1');
+    expect(out).toHaveLength(1);
+    expect(texts(out)).toEqual([['-2.8', '-1']]);
+  });
+
+  it('drops empty entries produced by consecutive semicolons', () => {
+    const out = tokenize('1 2;;3 4;');
+    expect(texts(out)).toEqual([
+      ['1', '2'],
+      ['3', '4'],
+    ]);
+  });
+
+  it('chains continuations across more than two physical lines', () => {
+    const out = tokenize('1 TO 7 -\n8 9 -\n10');
+    expect(out).toHaveLength(1);
+    expect(out[0].line).toBe(1);
+    expect(texts(out)).toEqual([['1', 'TO', '7', '8', '9', '10']]);
+  });
+
+  it('continues an entry after a semicolon-packed line, preserving line numbers', () => {
+    const out = tokenize('1 0 0; 2 1 0 -\n3 2 0');
+    expect(out).toHaveLength(2);
+    expect(texts(out)).toEqual([
+      ['1', '0', '0'],
+      ['2', '1', '0', '3', '2', '0'],
+    ]);
+    expect(out[0].line).toBe(1);
+    expect(out[1].line).toBe(1); // continuation keeps the first physical line's number
+  });
+
+  it('drops a dangling continuation hyphen at end of input', () => {
+    const out = tokenize('1 TO 7 -');
+    expect(out).toHaveLength(1);
+    expect(texts(out)).toEqual([['1', 'TO', '7']]);
+  });
+
+  it('handles very long lines in linear time without pathological behavior', () => {
+    const many = Array.from({ length: 2000 }, (_, i) => String(i));
+    const out = tokenize(many.join(' '));
+    expect(out).toHaveLength(1);
+    expect(out[0].tokens).toHaveLength(2000);
+    expect(out[0].tokens[1999].text).toBe('1999');
+  });
+});
