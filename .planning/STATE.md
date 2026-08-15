@@ -6,14 +6,14 @@ current_phase: 01
 current_phase_name: parser-model
 status: executing
 stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-08-15T19:44:31.664Z"
+last_updated: "2026-08-15T20:01:24.775Z"
 last_activity: 2026-08-15
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 9
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 01 (parser-model) — EXECUTING
-Plan: 3 of 9
+Plan: 4 of 9
 Status: Ready to execute
 Last activity: 2026-08-15 — Phase 01 execution started
 
-Progress: [██░░░░░░░░] 22%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [██░░░░░░░░] 22%
 
 | Phase 01-parser-model P1 | 3min | 3 tasks | 7 files |
 | Phase 01-parser-model P2 | 4min | 3 tasks | 2 files |
+| Phase 01-parser-model P3 | 12min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,10 @@ Recent decisions affecting current work:
 - [Phase 01-parser-model]: Continuation detection is token-based (a standalone trailing - token at end of physical line) not char-based - negative numbers like -2.8 and mid-line - are naturally data
 - [Phase 01-parser-model]: Unterminated quotes close at end of line (quote region = rest of line) - tolerant, never throws (T-02-03)
 - [Phase 01-parser-model]: Line-ending normalization uses literal replaceAll (not regex) - no regex touches input content (T-02-01 ReDoS mitigation)
+- [Phase 01-parser-model]: Group count boundary is END GROUP DEFINITION (40 entries), NOT MEMBER PROPERTY (75): naive block scan over-counts ELEMENT PROPERTY/DEFINE MATERIAL entries
+- [Phase 01-parser-model]: LOAD disambiguation (checker #9): LOAD <digits> LOADTYPE = primary (14), LOAD COMB <id> = combination (274), loadCases = sum (288); non-numeric LOAD R1 LOADTYPE Mass excluded by digit check
+- [Phase 01-parser-model]: Ambient node-env.d.ts shim (node:fs/node:path/node:url + ImportMeta) instead of installing @types/node — T-03-SC forbids installs, 01-01 owns dependencies
+- [Phase 01-parser-model]: Counting helpers accept abbreviated headers (MEMB INCI / ELEM INCI) per PITFALLS P2
 
 ### Pending Todos
 
@@ -98,6 +103,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-15T19:42:02.591Z
+Last session: 2026-08-15T19:59:31.680Z
 Stopped at: Completed 01-02-PLAN.md
 Resume file: None

@@ -38,7 +38,7 @@ Plans:
 
 - [x] 01-01-PLAN.md — Scaffold headless parser package, types, warning codes
 - [x] 01-02-PLAN.md — Tokenizer (TDD)
-- [ ] 01-03-PLAN.md — Golden-file fixture corpus (real + hand-written)
+- [x] 01-03-PLAN.md — Golden-file fixture corpus (real + hand-written)
 - [ ] 01-04-PLAN.md — Unit-state machine, block segmentation, parse core (TDD)
 - [ ] 01-05-PLAN.md — JOINT COORDINATES + MEMBER INCIDENCES handlers
 - [ ] 01-06-PLAN.md — MEMBER PROPERTY, section resolver, CONSTANTS material
