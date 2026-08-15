@@ -108,46 +108,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FILE-01 | — | Pending |
-| FILE-02 | — | Pending |
-| FILE-03 | — | Pending |
-| FILE-04 | — | Pending |
-| PARSE-01 | — | Pending |
-| PARSE-02 | — | Pending |
-| PARSE-03 | — | Pending |
-| PARSE-04 | — | Pending |
-| PARSE-05 | — | Pending |
-| REND-01 | — | Pending |
-| REND-02 | — | Pending |
-| REND-03 | — | Pending |
-| REND-04 | — | Pending |
-| REND-05 | — | Pending |
-| REND-06 | — | Pending |
-| COLOR-01 | — | Pending |
-| COLOR-02 | — | Pending |
-| COLOR-03 | — | Pending |
-| COLOR-04 | — | Pending |
-| MARK-01 | — | Pending |
-| MARK-02 | — | Pending |
-| MARK-03 | — | Pending |
-| MARK-04 | — | Pending |
-| INSP-01 | — | Pending |
-| INSP-02 | — | Pending |
-| INSP-03 | — | Pending |
-| SUMR-01 | — | Pending |
-| SUMR-02 | — | Pending |
-| SUMR-03 | — | Pending |
-| PLAT-01 | — | Pending |
-| PLAT-02 | — | Pending |
-| PLAT-03 | — | Pending |
-| PERF-01 | — | Pending |
-| PERF-02 | — | Pending |
+| FILE-01 | Phase 2 | Pending |
+| FILE-02 | Phase 2 | Pending |
+| FILE-03 | Phase 2 | Pending |
+| FILE-04 | Phase 2 | Pending |
+| PARSE-01 | Phase 1 | Pending |
+| PARSE-02 | Phase 1 | Pending |
+| PARSE-03 | Phase 1 | Pending |
+| PARSE-04 | Phase 1 | Pending |
+| PARSE-05 | Phase 1 | Pending |
+| REND-01 | Phase 2 | Pending |
+| REND-02 | Phase 2 | Pending |
+| REND-03 | Phase 2 | Pending |
+| REND-04 | Phase 2 | Pending |
+| REND-05 | Phase 2 | Pending |
+| REND-06 | Phase 2 | Pending |
+| COLOR-01 | Phase 3 | Pending |
+| COLOR-02 | Phase 3 | Pending |
+| COLOR-03 | Phase 3 | Pending |
+| COLOR-04 | Phase 3 | Pending |
+| MARK-01 | Phase 3 | Pending |
+| MARK-02 | Phase 3 | Pending |
+| MARK-03 | Phase 3 | Pending |
+| MARK-04 | Phase 3 | Pending |
+| INSP-01 | Phase 3 | Pending |
+| INSP-02 | Phase 3 | Pending |
+| INSP-03 | Phase 3 | Pending |
+| SUMR-01 | Phase 3 | Pending |
+| SUMR-02 | Phase 3 | Pending |
+| SUMR-03 | Phase 3 | Pending |
+| PLAT-01 | Phase 4 | Pending |
+| PLAT-02 | Phase 4 | Pending |
+| PLAT-03 | Phase 4 | Pending |
+| PERF-01 | Phase 4 | Pending |
+| PERF-02 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 34 total
-- Mapped to phases: 0
-- Unmapped: 34 ⚠️ (awaiting roadmap)
+- Mapped to phases: 34 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-08-15*
-*Last updated: 2026-08-15 after initial definition*
+*Last updated: 2026-08-15 after roadmap creation (all 34 v1 requirements mapped)*
