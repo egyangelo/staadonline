@@ -32,12 +32,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Unknown or version-drifted commands are skipped with collected warnings, never fatal; free-format grammar (semicolons, `*` comments, `" -"` continuations, abbreviations, trailing-dot floats) is handled.
   4. The parser produces a typed model (nodes, members, sections, supports, loads, groups, bounds) with zero DOM/Three imports — headless, unit-testable, worker-ready.
 
-**Plans**: 1/9 plans executed
+**Plans**: 2/9 plans executed
 
 Plans:
 
 - [x] 01-01-PLAN.md — Scaffold headless parser package, types, warning codes
-- [ ] 01-02-PLAN.md — Tokenizer (TDD)
+- [x] 01-02-PLAN.md — Tokenizer (TDD)
 - [ ] 01-03-PLAN.md — Golden-file fixture corpus (real + hand-written)
 - [ ] 01-04-PLAN.md — Unit-state machine, block segmentation, parse core (TDD)
 - [ ] 01-05-PLAN.md — JOINT COORDINATES + MEMBER INCIDENCES handlers
@@ -99,7 +99,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Parser & Model | 1/9 | In Progress|  |
+| 1. Parser & Model | 2/9 | In Progress|  |
 | 2. File Opening & 3D Rendering | TBD | Not started | - |
 | 3. Interaction & Visualization | TBD | Not started | - |
 | 4. Native Packaging & Performance | TBD | Not started | - |

@@ -5,16 +5,16 @@ milestone_name: STAAD Online Viewer
 current_phase: 01
 current_phase_name: parser-model
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-08-15T19:36:30.764Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-08-15T19:44:31.664Z"
 last_activity: 2026-08-15
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 9
-  completed_plans: 1
-  percent: 11
+  completed_plans: 2
+  percent: 0
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 01 (parser-model) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Last activity: 2026-08-15 — Phase 01 execution started
 
-Progress: [█░░░░░░░░░] 11%
+Progress: [██░░░░░░░░] 22%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [█░░░░░░░░░] 11%
 - Trend: —
 
 | Phase 01-parser-model P1 | 3min | 3 tasks | 7 files |
+| Phase 01-parser-model P2 | 4min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,10 @@ Recent decisions affecting current work:
 - [Phase 01-parser-model]: Unit tokens are STAAD abbreviated forms (FT/IN/KIP/LB/KN/M) as literal unions in UnitLength/UnitForce — Parser unit-state machine maps UNIT command tokens directly; D-03 locked shape
 - [Phase 01-parser-model]: Sections and groups stored in Map containers (no eval-prone structures) — Threat model T-01 boundary prefers Map-based containers; lookup by sectionKey/group name
 - [Phase 01-parser-model]: TypeScript 7.0.2 + Vitest 4.1.10 installed as latest stable — STACK.md pins latest stable; verified against npm registry before install
+- [Phase 01-parser-model]: Tokenizer emits entries (TokenizedLine { line, tokens }) not physical lines - semicolon-packed GUI output becomes N entries sharing the source line number; continuations keep the first physical line number
+- [Phase 01-parser-model]: Continuation detection is token-based (a standalone trailing - token at end of physical line) not char-based - negative numbers like -2.8 and mid-line - are naturally data
+- [Phase 01-parser-model]: Unterminated quotes close at end of line (quote region = rest of line) - tolerant, never throws (T-02-03)
+- [Phase 01-parser-model]: Line-ending normalization uses literal replaceAll (not regex) - no regex touches input content (T-02-01 ReDoS mitigation)
 
 ### Pending Todos
 
@@ -93,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-15T19:36:30.756Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-08-15T19:42:02.591Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
