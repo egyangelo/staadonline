@@ -94,6 +94,7 @@ function firstWord(line: string): string {
 export function countJoints(text: string): number {
   const lines = normalizeLines(text);
   const start = lines.findIndex((l) => l.trim().startsWith('JOINT COORDINATES'));
+  if (start === -1) return 0; // no joint block → no joints
   let max = 0;
   for (let i = start + 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -112,10 +113,14 @@ export function countJoints(text: string): number {
 /**
  * Count rows as semicolon-terminated entries inside the named block.
  * Used for MEMBER INCIDENCES (members) and ELEMENT INCIDENCES (elements).
+ * Accepts full and abbreviated header forms (PITFALLS P2 — `MEMB INCI`,
+ * `ELEM INCI`); returns 0 when the block header is absent (fixtures without
+ * the block must not leak counts from the rest of the file).
  */
-function countBlockEntries(text: string, header: string): number {
+function countBlockEntries(text: string, headers: string[]): number {
   const lines = normalizeLines(text);
-  const start = lines.findIndex((l) => l.trim().startsWith(header));
+  const start = lines.findIndex((l) => headers.some((h) => l.trim().startsWith(h)));
+  if (start === -1) return 0;
   let count = 0;
   for (let i = start + 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -128,14 +133,14 @@ function countBlockEntries(text: string, header: string): number {
   return count;
 }
 
-/** Member rows in MEMBER INCIDENCES. */
+/** Member rows in MEMBER INCIDENCES (accepts `MEMB INCI` abbreviation). */
 export function countMemberRows(text: string): number {
-  return countBlockEntries(text, 'MEMBER INCIDENCES');
+  return countBlockEntries(text, ['MEMBER INCIDENCES', 'MEMB INCI']);
 }
 
 /** Element rows in ELEMENT INCIDENCES (incl. ELEMENT INCIDENCES SHELL). */
 export function countElementRows(text: string): number {
-  return countBlockEntries(text, 'ELEMENT INCIDENCES');
+  return countBlockEntries(text, ['ELEMENT INCIDENCES', 'ELEM INCI']);
 }
 
 /**
@@ -146,6 +151,7 @@ export function countElementRows(text: string): number {
 export function countGroupEntries(text: string): number {
   const lines = normalizeLines(text);
   const start = lines.findIndex((l) => l.trim().startsWith('START GROUP DEFINITION'));
+  if (start === -1) return 0; // no group block → no group entries (fixtures without groups)
   const endIdx = lines.findIndex((l, i) => i > start && l.trim().startsWith('END GROUP DEFINITION'));
   const end = endIdx === -1 ? lines.length : endIdx;
   const SUB_HEADERS = new Set(['JOINT', 'ELEMENT', 'MEMBER']);
