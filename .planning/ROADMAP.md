@@ -28,7 +28,18 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. The parser tracks running unit state (default FEET KIPS, mid-file switches) so mixed-unit files normalize to the correct physical size.
   3. Unknown or version-drifted commands are skipped with collected warnings, never fatal; free-format grammar (semicolons, `*` comments, `" -"` continuations, abbreviations, trailing-dot floats) is handled.
   4. The parser produces a typed model (nodes, members, sections, supports, loads, groups, bounds) with zero DOM/Three imports — headless, unit-testable, worker-ready.
-**Plans**: TBD
+**Plans**: 9 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold headless parser package, types, warning codes
+- [ ] 01-02-PLAN.md — Tokenizer (TDD)
+- [ ] 01-03-PLAN.md — Golden-file fixture corpus (real + hand-written)
+- [ ] 01-04-PLAN.md — Unit-state machine, block segmentation, parse core (TDD)
+- [ ] 01-05-PLAN.md — JOINT COORDINATES + MEMBER INCIDENCES handlers
+- [ ] 01-06-PLAN.md — MEMBER PROPERTY, section resolver, CONSTANTS material
+- [ ] 01-07-PLAN.md — SUPPORTS + GROUP DEFINITION handlers
+- [ ] 01-08-PLAN.md — LOAD cases, load items, tolerated commands
+- [ ] 01-09-PLAN.md — Production wiring + golden-file verification
 
 ### Phase 2: File Opening & 3D Rendering
 **Goal**: Users open a `.std` file via picker or drag-drop and see the 3D analytical model render correctly — real cross-section shapes, one InstancedMesh per section profile, auto-fit camera, touch/mouse navigation.
