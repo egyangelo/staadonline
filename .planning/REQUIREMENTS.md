@@ -20,7 +20,7 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 - [ ] **PARSE-02**: Parser tracks running unit state (default FEET KIPS, switching mid-file) so geometry renders at correct physical size
 - [ ] **PARSE-03**: Parser tolerates multiple STAAD versions and format variants — unknown commands are skipped with warnings, never fatal
 - [ ] **PARSE-04**: Parser handles `.std` free-format grammar: `;` multi-entry lines, `*` comments, line continuations, command abbreviations
-- [ ] **PARSE-05**: Parser produces a typed model (nodes, members, sections, supports, loads, groups, bounds) decoupled from rendering
+- [x] **PARSE-05**: Parser produces a typed model (nodes, members, sections, supports, loads, groups, bounds) decoupled from rendering
 
 ### 3D Rendering
 
@@ -116,7 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PARSE-02 | Phase 1 | Pending |
 | PARSE-03 | Phase 1 | Pending |
 | PARSE-04 | Phase 1 | Pending |
-| PARSE-05 | Phase 1 | Pending |
+| PARSE-05 | Phase 1 | Complete |
 | REND-01 | Phase 2 | Pending |
 | REND-02 | Phase 2 | Pending |
 | REND-03 | Phase 2 | Pending |
@@ -144,6 +144,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PERF-02 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 34 total
 - Mapped to phases: 34 ✓
 - Unmapped: 0 ✓
