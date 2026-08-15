@@ -1,0 +1,17 @@
+* Hand-written fixture: 2D plane structure (D-07: STAAD PLANE, Z omitted)
+* Joints use 2D coordinates (x y) — no Z column, unlike STAAD SPACE.
+* Expected (manifest 'plane-2d'): joints=3 members=2 elements=0 groups=0 loads=0
+* unit METER/KN
+STAAD PLANE
+UNIT METER KN
+JOINT COORDINATES
+1 0 0
+2 6 0
+3 6 4
+MEMBER INCIDENCES
+1 1 2
+2 2 3
+SUPPORTS
+1 PINNED
+2 PINNED
+* end of fixture

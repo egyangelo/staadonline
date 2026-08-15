@@ -1,0 +1,22 @@
+* Hand-written fixture: continuations & abbreviations (D-05).
+* - `;`-packed JOINT COORDINATES on a single physical line
+* - `*` comment line between blocks
+* - abbreviated command header `MEMB INCI` (D-05 abbreviations)
+* - `" -"` continuation: row 3 ends with `-` and merges with row 4 into ONE
+*   tokenized entry defining members 3 and 4 (4 member rows, 2 of them merged).
+* Expected (manifest 'continuations'): joints=3 members=4 unit METER/KN
+STAAD SPACE
+UNIT METER KN
+JOINT COORDINATES
+1 0 0 0; 2 6 0 0; 3 6 0 4
+* comment line between blocks
+MEMB INCI
+1 1 2
+2 2 3
+3 3 1 -
+4 1 2
+SUPPORTS
+1 FIXED
+2 FIXED
+3 FIXED
+* end of fixture

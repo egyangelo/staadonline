@@ -1,0 +1,18 @@
+* Hand-written fixture: imperial units (D-06: feet + kips) with a mid-file
+* UNIT switch (PITFALLS P1 — units are stateful): FEET KIPS then INCH for
+* member properties. The manifest's unit detection takes the FIRST UNIT line.
+* Expected (manifest 'feet-imperial'): joints=3 members=2 unit FEET/KIPS
+STAAD SPACE
+UNIT FEET KIPS
+JOINT COORDINATES
+1 0 0 0
+2 10 0 0
+3 10 12 0
+MEMBER INCIDENCES
+1 1 2
+2 2 3
+UNIT INCH
+MEMBER PROPERTY
+1 PRIS YD 12 ZD 8
+2 PRIS YD 12 ZD 8
+* end of fixture

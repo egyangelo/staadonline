@@ -1,0 +1,19 @@
+* Hand-written fixture: unknown command tolerance (D-05 unknown commands).
+* A FROBNICATE block (header + body lines) sits between MEMBER INCIDENCES and
+* SUPPORTS. The parser must skip the unknown command and its body with a
+* warning, keeping the surrounding valid structure (2 joints, 1 member).
+* Expected (manifest 'unknown-commands'): joints=2 members=1 unit METER/KN
+STAAD SPACE
+UNIT METER KN
+JOINT COORDINATES
+1 0 0 0
+2 6 0 0
+MEMBER INCIDENCES
+1 1 2
+FROBNICATE 12 34
+5 6 7 8
+9 10 11
+SUPPORTS
+1 PINNED
+2 PINNED
+* end of fixture

@@ -1,0 +1,15 @@
+* Hand-written fixture: legacy table syntax (D-05 legacy tables) — the classic
+* unquoted form `1 2 TABLE ST W12X35` (member range, keyword, table name).
+* Expected (manifest 'legacy-table'): joints=3 members=2 unit FEET/KIPS
+STAAD SPACE
+UNIT FEET KIPS
+JOINT COORDINATES
+1 0 0 0
+2 15 0 0
+3 30 0 0
+MEMBER INCIDENCES
+1 1 2
+2 2 3
+MEMBER PROPERTY STEEL
+1 2 TABLE ST W12X35
+* end of fixture
