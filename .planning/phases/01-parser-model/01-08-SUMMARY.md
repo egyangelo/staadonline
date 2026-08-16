@@ -81,7 +81,7 @@ Each task was committed atomically (TDD pairs):
 2. **Task 2: SELFWEIGHT/MEMBER LOAD/JOINT LOAD items** - `89cc4bd` (test, RED) + `41354c9` (feat, GREEN)
 3. **Task 3: Tolerated commands + load mini-deck integration** - `6160c07` (feat incl. tests)
 
-**Plan metadata:** `pending` (docs commit follows)
+**Plan metadata:** `d958423` (docs: complete plan)
 
 ## Files Created/Modified
 - `packages/parser/src/staad/loads.ts` - CREATED. loadHandler, loadCombHandler, loadListHandler (Task 1); selfweightHandler, memberLoadHandler, jointLoadHandler, elementLoadHandler (Task 2); registration side effects for all seven keys
