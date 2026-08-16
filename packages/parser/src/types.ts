@@ -42,6 +42,12 @@ export interface Member {
   sectionKey?: string;
   group?: string;
   material?: string;
+  /**
+   * Member rotation about its member axis from CONSTANTS BETA (degrees),
+   * when the file carries it (D-06). Parser stores it unmodified — no unit
+   * conversion; the renderer consumes it when orienting extruded profiles.
+   */
+  rotation?: number;
 }
 
 /**
