@@ -5,15 +5,15 @@ milestone_name: STAAD Online Viewer
 current_phase: 01
 current_phase_name: parser-model
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-08-16T07:30:58.741Z"
+stopped_at: Completed 01-05-PLAN.md
+last_updated: "2026-08-16T07:45:14.330Z"
 last_activity: 2026-08-15
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 9
-  completed_plans: 3
+  completed_plans: 5
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 01 (parser-model) — EXECUTING
-Plan: 5 of 9
+Plan: 6 of 9
 Status: Ready to execute
 Last activity: 2026-08-15 — Phase 01 execution started
 
@@ -58,6 +58,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-parser-model P2 | 4min | 3 tasks | 2 files |
 | Phase 01-parser-model P3 | 12min | 3 tasks | 10 files |
 | Phase 01-parser-model P4 | 11min | 3 tasks | 9 files |
+| Phase 01-parser-model P5 | 7min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,11 @@ Recent decisions affecting current work:
 - [Phase 01-parser-model]: DEFINE-block tolerance (checker #8): single-pass scoped absorption; terminators are END DEFINE, or LOAD<digits>/PERFORM/PAGE/PRINT/DEFINE headers; non-numeric LOAD R1 LOADTYPE Mass is reference-load DATA (absorbed)
 - [Phase 01-parser-model]: Segmentation is a single-pass state machine: unquoted uppercase-first token = new header; digit/_/quote/- first tokens = body; leading body before any header is skipped silently
 - [Phase 01-parser-model]: STAAD header sets ctx.structure (PLANE/SPACE/FRAME); 2-coordinate joint rows valid only under PLANE/FRAME (z=0) — SPACE + 2-coord row = MALFORMED_LINE
+- [Phase 01-parser-model]: Member-row node-pair disambiguation via maximal-list scan (listItemLength): the node pair is the numeric pair after the LONGEST valid member list — '5 TO 7 10 20 100 200' -> members 5,6,7,10,20 with pair (100,200); '3 5 6 BETA 90' -> member 3 with pair (5,6), BETA tolerated
+- [Phase 01-parser-model]: expandList ALL without maxRef expands to nothing (no reference to resolve against, tolerant); with maxRef it is [1..maxRef]. Hard cap LIST_HARD_CAP = 1_000_000 bounds no-maxRef expansion; maxRef clamps ALL and range ends (T-05-01 zip-bomb guard)
+- [Phase 01-parser-model]: Geometry handlers (joint-coordinates, member-incidences) keep a LOCAL Map seeded from ctx.nodes/ctx.members for dedupe + lookup — T-05-02 mitigation without adding Map fields to ParseContext
+- [Phase 01-parser-model]: Handler registration uses canonical keys only (JOINT COORDINATES, MEMBER INCIDENCES); P2 abbreviations (JNT COORD, MEMB INCI, MEMBER INCIDENCE) are canonicalized by COMMAND_ALIASES before dispatch so alias table keys are redundant
+- [Phase 01-parser-model]: Geometry test files live in test/staad/ (one level deeper than the existing suite) per plan layout — module imports resolve via ../../src/... not ../src/...
 
 ### Pending Todos
 
@@ -109,6 +115,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-16T07:30:58.728Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-08-16T07:45:14.319Z
+Stopped at: Completed 01-05-PLAN.md
 Resume file: None
