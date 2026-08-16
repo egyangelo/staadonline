@@ -88,7 +88,7 @@ Each task was committed atomically (TDD stages separate):
 3. **Task 3: MEMBER INCIDENCES handler (TDD)** - `ef3d065` (test: RED) + `d9e9199` (feat: GREEN)
 4. **Wiring: geometry handlers into parseStaad** - `145b097` (feat)
 
-**Plan metadata:** `{docs-hash}` (docs: complete plan)
+**Plan metadata:** `8d986c2` (docs: complete plan)
 
 ## Files Created/Modified
 - `packages/parser/src/staad/lists.ts` - expandList (bounded range expansion), listItemLength (list-item scanner), parseListId (strict positive-integer parse), LIST_HARD_CAP
@@ -149,3 +149,10 @@ None - no external service configuration required.
 
 *Phase: 01-parser-model*
 *Completed: 2026-08-16*
+
+## Self-Check: PASSED
+
+- Created files verified on disk: `lists.ts`, `joint-coordinates.ts`, `member-incidences.ts`, all three `test/staad/*.test.ts` files, `01-05-SUMMARY.md` — all FOUND
+- Commits verified in git: `29774ea`, `ed2c450`, `aa39e3d`, `0421fd4`, `9e9a985`, `ef3d065`, `d9e9199`, `145b097`, `8d986c2` — all FOUND
+- Full suite: 101/101 vitest pass; `tsc --noEmit` clean
+- TDD gate compliance: 3× `test(01-05)` RED commits precede 3× `feat(01-05)` GREEN commits in `git log` — gate sequence valid, no violations
