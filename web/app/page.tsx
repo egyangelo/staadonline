@@ -1,166 +1,148 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import {
-  parseStaad,
-  registerParsingCommands,
-  type ParseResult,
-} from "@staad-online/parser";
-import styles from "./page.module.css";
+/**
+ * STAAD Online viewer page (02-07, D-11/D-12; FILE-01..FILE-04).
+ *
+ * Full-canvas 3D viewer with a minimal floating chrome cluster:
+ *   - <ViewerCanvas /> (02-05) fixed full-viewport behind the chrome;
+ *   - bottom-left cluster: OpenControl + ExaggerationSlider (02-06);
+ *   - StatsSummary (02-06) above the cluster;
+ *   - ErrorToast bottom-center when a typed error is set;
+ *   - LoadingOverlay (02-06) while status === 'loading'.
+ *
+ * State machine: EMPTY → LOADING → LOADED (ERROR reachable from LOADING;
+ * error restores EMPTY without touching model/warnings — FILE-03).
+ *
+ * Security (T-02-01..T-02-06): every file-derived string renders as a React
+ * text node (never dangerouslySetInnerHTML); open/drop funnel through
+ * FileService.readStdFile (FILE-04 guards INSIDE the service, page never
+ * re-checks size/extension); picker cancel no-ops by construction; a repeat
+ * open during LOADING aborts the in-flight open before committing.
+ */
+import { useCallback, useEffect, useRef, useState } from "react";
+import { parseStaad, registerParsingCommands } from "@staad-online/parser";
+import { FileServiceError, readStdFile } from "@/lib/fileService";
+import { useModelStore } from "@/store/modelStore";
+import { ViewerCanvas } from "@/components/ViewerCanvas";
+import { OpenControl } from "@/components/OpenControl";
+import { ExaggerationSlider } from "@/components/ExaggerationSlider";
+import { StatsSummary } from "@/components/StatsSummary";
+import { ErrorToast, type ErrorCode } from "@/components/ErrorToast";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
+import styles from "./viewer.module.css";
 
 registerParsingCommands();
 
-interface Stats {
-  nodes: number;
-  members: number;
-  sections: number;
-  supports: number;
-  loadCases: number;
-  groups: number;
-  units: string;
-  bounds: string;
-}
+const ERROR_CODE_MAP: Record<FileServiceError["code"], ErrorCode> = {
+  WRONG_TYPE: "WRONG_TYPE",
+  TOO_LARGE: "TOO_LARGE",
+  UNREADABLE: "UNREADABLE",
+};
 
 export default function Home() {
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [warnings, setWarnings] = useState<ParseResult["warnings"] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const status = useModelStore((s) => s.status);
+  const [error, setError] = useState<ErrorCode | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | undefined>(undefined);
   const [dragOver, setDragOver] = useState(false);
+  const openToken = useRef(0);
 
-  const parseFile = useCallback(async (file: File) => {
+  const openFile = useCallback(async (file: File) => {
+    // Every open aborts the previous in-flight one (FILE-03/T-02-06): a stale
+    // token means the old read must never commit setModel.
+    const token = ++openToken.current;
     setError(null);
-    setStats(null);
-    setWarnings(null);
-    if (!file.name.toLowerCase().endsWith(".std")) {
-      setError("Please choose a .std file (a STAAD input deck).");
-      return;
-    }
+    setErrorDetail(undefined);
+    useModelStore.getState().beginLoading();
+
     try {
-      const text = await file.text();
+      const { name, text } = await readStdFile(file);
+      if (token !== openToken.current) return;
       const result = parseStaad(text);
-      const { model } = result;
-      const b = model.bounds;
-      setFileName(file.name);
-      setStats({
-        nodes: model.nodes.length,
-        members: model.members.length,
-        sections: model.sections.size,
-        supports: model.supports.length,
-        loadCases: model.loadCases.length,
-        groups: model.groups.size,
-        units: `${model.units.length} / ${model.units.force}`,
-        bounds: `X ${b.min[0].toFixed(2)}..${b.max[0].toFixed(2)}  Y ${b.min[1].toFixed(2)}..${b.max[1].toFixed(2)}  Z ${b.min[2].toFixed(2)}..${b.max[2].toFixed(2)}`,
-      });
-      setWarnings(result.warnings);
+      if (token !== openToken.current) return;
+      useModelStore.getState().setModel(result, name);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      if (token !== openToken.current) return;
+      if (e instanceof FileServiceError) {
+        setError(ERROR_CODE_MAP[e.code]);
+      } else {
+        setError("PARSE");
+        setErrorDetail(e instanceof Error ? e.message : String(e));
+      }
+      // EMPTY restored without touching model/warnings (FILE-03).
+      useModelStore.getState().setError();
     }
   }, []);
 
-  const onDrop = useCallback(
-    (e: React.DragEvent) => {
+  useEffect(() => {
+    const onDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      setDragOver(true);
+    };
+    const onDragLeave = (e: DragEvent) => {
+      if (e.relatedTarget === null) setDragOver(false);
+    };
+    const onDrop = (e: DragEvent) => {
       e.preventDefault();
       setDragOver(false);
-      const file = e.dataTransfer.files?.[0];
-      if (file) void parseFile(file);
-    },
-    [parseFile],
-  );
+      const file = e.dataTransfer?.files?.[0];
+      if (file) void openFile(file);
+    };
+    window.addEventListener("dragover", onDragOver);
+    window.addEventListener("dragleave", onDragLeave);
+    window.addEventListener("drop", onDrop);
+    return () => {
+      window.removeEventListener("dragover", onDragOver);
+      window.removeEventListener("dragleave", onDragLeave);
+      window.removeEventListener("drop", onDrop);
+    };
+  }, [openFile]);
+
+  const ready = status === "ready";
+  const loading = status === "loading";
+  const empty = status === "empty" && !error;
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>STAAD Online</h1>
-        <p className={styles.subtitle}>
-          Upload a STAAD <code>.std</code> file — parsed entirely in your
-          browser, nothing is uploaded anywhere.
-        </p>
+    <div
+      className={`${styles.page} ${dragOver ? styles.dragOver : ""}`}
+      aria-busy={loading}
+    >
+      <ViewerCanvas />
 
-        <div
-          className={`${styles.dropzone} ${dragOver ? styles.dragover : ""}`}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
-          }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={onDrop}
-        >
-          <label className={styles.fileLabel}>
-            <span>{fileName ?? "Drop a .std file here, or click to browse"}</span>
-            <input
-              type="file"
-              accept=".std"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void parseFile(file);
-              }}
-            />
-          </label>
+      {empty && (
+        <section className={styles.emptyState}>
+          <h1 className={styles.emptyTitle}>No model loaded</h1>
+          <p className={styles.emptyBody}>
+            Open a <code>.std</code> STAAD input deck to see its analytical
+            model in 3D. Parsing happens entirely in your browser — nothing is
+            uploaded.
+          </p>
+          <p className={styles.emptyNext}>
+            Use “Open STAAD File”, or drag a <code>.std</code> file onto this
+            window.
+          </p>
+        </section>
+      )}
+
+      {ready && (
+        <div className={styles.statsWrap}>
+          <StatsSummary />
         </div>
+      )}
 
-        {error && <p className={styles.error}>{error}</p>}
+      <div className={styles.cluster}>
+        <OpenControl onOpen={openFile} />
+        <ExaggerationSlider />
+      </div>
 
-        {stats && (
-          <section className={styles.results}>
-            <h2>Model summary</h2>
-            <div className={styles.grid}>
-              <div className={styles.card}>
-                <span className={styles.cardValue}>{stats.nodes}</span>
-                <span className={styles.cardLabel}>Joints</span>
-              </div>
-              <div className={styles.card}>
-                <span className={styles.cardValue}>{stats.members}</span>
-                <span className={styles.cardLabel}>Members</span>
-              </div>
-              <div className={styles.card}>
-                <span className={styles.cardValue}>{stats.sections}</span>
-                <span className={styles.cardLabel}>Sections</span>
-              </div>
-              <div className={styles.card}>
-                <span className={styles.cardValue}>{stats.supports}</span>
-                <span className={styles.cardLabel}>Supports</span>
-              </div>
-              <div className={styles.card}>
-                <span className={styles.cardValue}>{stats.loadCases}</span>
-                <span className={styles.cardLabel}>Load cases</span>
-              </div>
-              <div className={styles.card}>
-                <span className={styles.cardValue}>{stats.groups}</span>
-                <span className={styles.cardLabel}>Groups</span>
-              </div>
-            </div>
-            <dl className={styles.details}>
-              <div>
-                <dt>Units</dt>
-                <dd>{stats.units}</dd>
-              </div>
-              <div>
-                <dt>Bounds</dt>
-                <dd>{stats.bounds}</dd>
-              </div>
-            </dl>
-          </section>
-        )}
+      {error && (
+        <ErrorToast
+          code={error}
+          detail={errorDetail}
+          onDismiss={() => setError(null)}
+        />
+      )}
 
-        {warnings && warnings.length > 0 && (
-          <section className={styles.warnings}>
-            <h2>Warnings ({warnings.length})</h2>
-            <ul>
-              {warnings.slice(0, 20).map((w, i) => (
-                <li key={i}>
-                  <code>{w.code}</code> line {w.line} — {w.message}
-                </li>
-              ))}
-              {warnings.length > 20 && <li>… and {warnings.length - 20} more</li>}
-            </ul>
-          </section>
-        )}
-
-        {stats && warnings && warnings.length === 0 && (
-          <p className={styles.clean}>Clean parse — no warnings.</p>
-        )}
-      </main>
+      {loading && <LoadingOverlay />}
     </div>
   );
 }
