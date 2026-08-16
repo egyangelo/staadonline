@@ -90,7 +90,7 @@ Each task was committed atomically:
 2. **Task 2: Block segmentation + canonicalization + finalize** - `ff85931` (feat)
 3. **Task 3: Command dispatch + public parseStaad entry** - `9b67765` (feat)
 
-**Plan metadata:** `_see_record_commit_` (docs: complete plan)
+**Plan metadata:** `4f38132` (docs: complete plan)
 
 _Note: Task 1 was a TDD task (test → feat commits)._
 
