@@ -22,28 +22,36 @@ import { tokenize } from './tokenizer';
 import { WARNING_CODES, type ParseResult, type ParseWarning, type StaadModel } from './types';
 
 // Side-effect registration of the core-state handlers (01-04) plus the
-// geometry handlers (01-05) and property/material handlers (01-06): UNIT,
-// STAAD, JOINT COORDINATES, MEMBER INCIDENCES, MEMBER PROPERTY, CONSTANTS
-// (incl. MATERIAL/BETA). 01-09 extends this import list with the remaining
-// handler modules (supports, loads, groups).
+// geometry handlers (01-05), property/material handlers (01-06), supports
+// and groups (01-07), loads (01-08), and the tolerated/skipped-command
+// surface (01-08/01-09). Each module's `registerCommand` calls execute on
+// import, so importing the module IS the wiring (01-09 final wiring).
 import './staad/units';
 import './staad/header';
 import './staad/joint-coordinates';
 import './staad/member-incidences';
 import './staad/member-property';
 import './staad/constants';
+import './staad/supports';
+import './staad/groups';
+import './staad/loads';
+import './staad/steel-resolver';
+import { registerSkippedCommands } from './staad/skipped';
 
 /** Input-size guard threshold (T-04-01): larger inputs are refused, not parsed. */
 export const MAX_INPUT_LENGTH = 64_000_000;
 
 /**
- * Bootstrap the production command set. The core-state handlers (UNIT, STAAD)
- * register via the static side-effect imports above; 01-09 completes the
- * import list with the remaining handler modules. Production code calls this
+ * Bootstrap the production command set. Every handler module registers via
+ * its module-import side effect (imports above — the 01-09 final wiring);
+ * the skipped-command registrations (IGNORED_COMMAND / SKIPPED_ELEMENT /
+ * silent CHANGE+FINISH) are additionally invoked here so the tolerated-
+ * command surface is part of the documented bootstrap (idempotent —
+ * registerCommand is safe to call repeatedly). Production code calls this
  * once at startup so the registration surface stays explicit.
  */
 export function registerParsingCommands(): void {
-  // Registration happens on module import (side effects above).
+  registerSkippedCommands();
 }
 
 /** Empty model with P1 default units — used by the size guard's warning result. */
