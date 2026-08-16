@@ -22,13 +22,16 @@ import { tokenize } from './tokenizer';
 import { WARNING_CODES, type ParseResult, type ParseWarning, type StaadModel } from './types';
 
 // Side-effect registration of the core-state handlers (01-04) plus the
-// geometry handlers (01-05): UNIT, STAAD, JOINT COORDINATES, MEMBER
-// INCIDENCES. 01-09 extends this import list with the remaining handler
-// modules (properties, supports, loads, groups).
+// geometry handlers (01-05) and property/material handlers (01-06): UNIT,
+// STAAD, JOINT COORDINATES, MEMBER INCIDENCES, MEMBER PROPERTY, CONSTANTS
+// (incl. MATERIAL/BETA). 01-09 extends this import list with the remaining
+// handler modules (supports, loads, groups).
 import './staad/units';
 import './staad/header';
 import './staad/joint-coordinates';
 import './staad/member-incidences';
+import './staad/member-property';
+import './staad/constants';
 
 /** Input-size guard threshold (T-04-01): larger inputs are refused, not parsed. */
 export const MAX_INPUT_LENGTH = 64_000_000;

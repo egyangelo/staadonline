@@ -37,9 +37,11 @@ function countJointRows(text: string): number {
  * - (1) the real corpus fixture parses WITHOUT throwing using the production
  *       handlers: UNIT and STAAD run through the real COMMAND_TABLE,
  *       JOINT COORDINATES / MEMBER INCIDENCES (01-05) populate nodes and
- *       members, unknown blocks become UNKNOWN_COMMAND warnings, unit state
- *       lands in the model, bounds are computed, node 2 is at y = -2.8
- *       (key_context), and member rows match the manifest count.
+ *       members, MEMBER PROPERTY (01-06) resolves PRIS/TABLE sections, and
+ *       CONSTANTS (01-06) stores MATERIAL — unknown blocks become
+ *       UNKNOWN_COMMAND warnings, unit state lands in the model, bounds are
+ *       computed, node 2 is at y = -2.8 (key_context), and member rows match
+ *       the manifest count.
  * - (2) empty input → empty model, no warnings, P1 defaults.
  * - (3) STAAD PLANE + 2-coordinate rows → z = 0, no MALFORMED_LINE
  *       (checker #3 D-02 2D coverage).
@@ -97,7 +99,26 @@ describe('parseStaad — public entry (01-04)', () => {
     // MEMBER INCIDENCES (production handler) populated the model: exact
     // manifest-computed member count with 1-based source ids preserved (D-04).
     expect(result.model.members).toHaveLength(expected['real/HPP_Main_Building_2.std'].members);
-    expect(result.model.members.find((m) => m.id === 1)).toEqual({ id: 1, startNode: 1, endNode: 739 });
+    const member1 = result.model.members.find((m) => m.id === 1);
+    expect(member1).toMatchObject({ id: 1, startNode: 1, endNode: 739 });
+
+    // MEMBER PROPERTY (01-06): TABLE rows resolved to approximate fallback
+    // sections (D-05), members linked by direct range links and via named
+    // groups at finalize.
+    const ipe = result.model.sections.get('IPE 300');
+    expect(ipe).toBeDefined();
+    expect(ipe!.approximate).toBe(true);
+    expect(result.model.sections.get('12CS3.5X105')?.approximate).toBe(true);
+    expect(result.model.members.find((m) => m.id === 964)?.sectionKey).toBe('IPE 300');
+    expect(result.model.members.find((m) => m.id === 1042)?.sectionKey).toBe('12CS3.5X105');
+    // NOTE: named-section→member links via groups are proven in the 01-06
+    // member-property unit test (seeded group); the real file's START GROUP
+    // DEFINITION handler lands in 01-08.
+    expect(result.warnings.filter((w) => w.code === WARNING_CODES.UNRESOLVED_SECTION).length).toBeGreaterThan(0);
+
+    // CONSTANTS (01-06): MATERIAL stored on members (D-03 color-by-material).
+    expect(result.model.members.find((m) => m.id === 1)?.material).toBe('CONCRETE');
+    expect(result.model.members.find((m) => m.id === 964)?.material).toBe('STEEL_36_KSI');
   });
 
   it('(2) parses empty input into an empty model with P1 defaults and no warnings', () => {
