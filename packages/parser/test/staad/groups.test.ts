@@ -88,14 +88,16 @@ describe('GROUP DEFINITION handler (01-07 Task 2)', () => {
     expect(group!.memberIds).toEqual([]);
     expect(ctx.warnings).toHaveLength(1);
     expect(ctx.warnings[0].code).toBe(WARNING_CODES.SKIPPED_ELEMENT);
-    expect(ctx.warnings[0].line).toBe(1);
+    expect(ctx.warnings[0].line).toBe(2); // the _RAFT row is on physical line 2
   });
 
   it('(4) `-` continuation lines are merged by the tokenizer into one row', () => {
     const ctx = createContext();
+    // STAAD continuation: a TRAILING lone `-` on a line (e.g. `_RAFT 132 TO 162 211 -`
+    // in the real corpus) folds the NEXT physical line into the same entry.
     startGroupsHandler(
       ctx,
-      groupsBlock('MEMBER\n_COLS 1 TO 5\n- 49 TO 51'),
+      groupsBlock('MEMBER\n_COLS 1 TO 5 -\n49 TO 51'),
     );
     const group = ctx.groups.get('_COLS');
     expect(group).toBeDefined();
@@ -120,7 +122,7 @@ describe('GROUP DEFINITION handler (01-07 Task 2)', () => {
     expect(ctx.groups.size).toBe(0);
     expect(ctx.warnings).toHaveLength(1);
     expect(ctx.warnings[0].code).toBe(WARNING_CODES.MALFORMED_LINE);
-    expect(ctx.warnings[0].line).toBe(1);
+    expect(ctx.warnings[0].line).toBe(2); // the row is on physical line 2
   });
 
   it('(7) group name keeps its exact underscore spelling (D-04 source fidelity)', () => {
@@ -144,7 +146,7 @@ describe('GROUP DEFINITION handler (01-07 Task 2)', () => {
     expect(ctx.groups.size).toBe(4);
     expect(ctx.groups.get('_F7')!.jointIds).toEqual([303]);
     expect(ctx.groups.get('_F8')!.jointIds).toEqual([308]);
-    expect(ctx.groups.get('_COLS')!.memberIds).toHaveLength(20);
+    expect(ctx.groups.get('_COLS')!.memberIds).toHaveLength(21); // 12 + 9 = 21 ids
     expect(ctx.groups.get('_RAFT')!.elementIds).toHaveLength(32);
     // Only the ELEMENT row warns (D-07).
     expect(ctx.warnings).toHaveLength(1);
