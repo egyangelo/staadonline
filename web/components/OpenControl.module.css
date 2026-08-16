@@ -1,0 +1,71 @@
+/* OpenControl — UI-SPEC tokens (02-06 Task 1, D-12). */
+
+.container {
+  display: inline-flex;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: #007aFF;
+  color: #ffffff;
+  font: 600 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  cursor: pointer;
+  transition: transform 150ms ease, opacity 150ms ease;
+}
+
+.button:active {
+  transform: scale(0.97);
+}
+
+.button:focus-visible {
+  outline: 2px solid #007aFF;
+  outline-offset: 2px;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+.input {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .button {
+    min-height: 44px;
+  }
+}
+
+@media (pointer: fine) {
+  .button {
+    min-height: 36px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .button {
+    background: #0a84FF;
+  }
+
+  .button:focus-visible {
+    outline-color: #0a84FF;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: opacity 150ms ease;
+  }
+
+  .button:active {
+    transform: none;
+  }
+}
