@@ -140,3 +140,88 @@ describe('LOAD case headers (01-08 Task 1)', () => {
     expect(ctx.currentLoadCase).toBe(ctx.loadCases[0]);
   });
 });
+
+describe('SELFWEIGHT / MEMBER LOAD / JOINT LOAD items (01-08 Task 2)', () => {
+  it('(1) SELFWEIGHT Y -1 LIST 1 TO 12 15 TO 18 → SELFWEIGHT item with expanded targets', () => {
+    const ctx = parse('LOAD 1 LOADTYPE Dead TITLE D\nSELFWEIGHT Y -1 LIST 1 TO 12 15 TO 18');
+    const lc = ctx.loadCases[0];
+    expect(lc.items).toHaveLength(1);
+    expect(lc.items[0]).toMatchObject({
+      kind: 'SELFWEIGHT',
+      axis: 'Y',
+      axisRef: 'GLOBAL',
+      magnitude: -1,
+    });
+    expect(lc.items[0].targets).toEqual([...range(1, 12), ...range(15, 18)]);
+  });
+
+  it('(2) SELFWEIGHT with no LIST → implicit ALL, empty targets', () => {
+    const ctx = parse('LOAD 1\nSELFWEIGHT Y -1');
+    expect(ctx.loadCases[0].items[0]).toMatchObject({ kind: 'SELFWEIGHT', axis: 'Y', magnitude: -1 });
+    expect(ctx.loadCases[0].items[0].targets).toEqual([]);
+  });
+
+  it('(3) MEMBER LOAD row with G-prefixed dir → global axis', () => {
+    const ctx = parse('LOAD 1\nMEMBER LOAD\n17 18 20 TO 48 UNI GY -27.6');
+    const lc = ctx.loadCases[0];
+    expect(lc.items).toHaveLength(1);
+    expect(lc.items[0]).toMatchObject({
+      kind: 'MEMBER_LOAD',
+      axis: 'Y',
+      axisRef: 'GLOBAL',
+      magnitude: -27.6,
+    });
+    expect(lc.items[0].targets).toEqual([17, 18, ...range(20, 48)]);
+  });
+
+  it('(4) local-axis member load UNI Y → axisRef LOCAL (PITFALLS UX)', () => {
+    const ctx = parse('LOAD 1\nMEMBER LOAD\n1 TO 2 UNI Y -5');
+    expect(ctx.loadCases[0].items[0]).toMatchObject({
+      kind: 'MEMBER_LOAD',
+      axis: 'Y',
+      axisRef: 'LOCAL',
+      magnitude: -5,
+    });
+  });
+
+  it('(5) JOINT LOAD 303 FY -123 → JOINT_LOAD global Y on joint 303', () => {
+    const ctx = parse('LOAD 1\nJOINT LOAD\n303 FY -123');
+    expect(ctx.loadCases[0].items[0]).toMatchObject({
+      kind: 'JOINT_LOAD',
+      axis: 'Y',
+      axisRef: 'GLOBAL',
+      magnitude: -123,
+      targets: [303],
+    });
+  });
+
+  it('(6) multi-joint JOINT LOAD row expands the joint list', () => {
+    const ctx = parse('LOAD 1\nJOINT LOAD\n1 2 3 FX -10');
+    expect(ctx.loadCases[0].items[0]).toMatchObject({ axis: 'X', magnitude: -10, targets: [1, 2, 3] });
+  });
+
+  it('(7) ELEMENT LOAD rows → SKIPPED_ELEMENT warning, no item added (D-07)', () => {
+    const ctx = parse('LOAD 1\nELEMENT LOAD\n132 TO 162 PR GY -28');
+    expect(ctx.loadCases[0].items).toEqual([]);
+    expect(ctx.warnings).toHaveLength(1);
+    expect(ctx.warnings[0].code).toBe(WARNING_CODES.SKIPPED_ELEMENT);
+  });
+
+  it('(8) malformed member-load row (no type/dir/mag) → MALFORMED_LINE, skipped', () => {
+    const ctx = parse('LOAD 1\nMEMBER LOAD\n1 TO 2');
+    expect(ctx.loadCases[0].items).toEqual([]);
+    expect(ctx.warnings.some((w) => w.code === WARNING_CODES.MALFORMED_LINE)).toBe(true);
+  });
+
+  it('(9) malformed joint-load row (no dir/mag) → MALFORMED_LINE, skipped', () => {
+    const ctx = parse('LOAD 1\nJOINT LOAD\n303');
+    expect(ctx.loadCases[0].items).toEqual([]);
+    expect(ctx.warnings.some((w) => w.code === WARNING_CODES.MALFORMED_LINE)).toBe(true);
+  });
+
+  it('(10) item rows outside any load case → MALFORMED_LINE, skipped (no implicit case)', () => {
+    const ctx = parse('SELFWEIGHT Y -1 LIST 1 TO 3');
+    expect(ctx.loadCases).toHaveLength(0);
+    expect(ctx.warnings.some((w) => w.code === WARNING_CODES.MALFORMED_LINE)).toBe(true);
+  });
+});
