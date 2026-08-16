@@ -6,8 +6,9 @@ import { applyUnitCommand, createUnitState, toMeters, type UnitState } from '../
 /**
  * Unit-state machine contract (PARSE-02 / PITFALLS P1):
  *
- * - Units are STATEFUL: default FEET + KIPS (canonical storage 'KIP' — the
- *   UnitForce union locked in 01-02 holds KIP, not the STAAD token KIPS).
+ * - Units are STATEFUL: default FEET + KIPS. Canonical storage uses the
+ *   literal unions locked in 01-02: FEET → 'FT', KIPS → 'KIP' (UnitLength/
+ *   UnitForce hold FT and KIP, not the STAAD tokens FEET/KIPS).
  * - `UNIT` lines switch the running state; every later numeric token is
  *   interpreted in the most recent declaration (Bentley TR.3).
  * - Aliases per PITFALLS P1 / TR.3: IN/INCH/INCHES, FT/FEET/FE, ME/METER/M,
@@ -32,9 +33,9 @@ function apply(state: UnitState, lineText: string, line = 10): { state: UnitStat
 }
 
 describe('unit-state defaults (P1)', () => {
-  it('fresh state has length FEET and force KIPS (canonical KIP)', () => {
+  it('fresh state has length FEET (canonical FT) and force KIPS (canonical KIP)', () => {
     const state = createUnitState();
-    expect(state.length).toBe('FEET');
+    expect(state.length).toBe('FT');
     expect(state.force).toBe('KIP');
   });
 });
@@ -122,7 +123,7 @@ describe('warning emission rules (D-06/D-07)', () => {
   it("a malformed unit line ('UNIT BANANA PINEAPPLE') leaves state unchanged and emits MALFORMED_LINE", () => {
     const state = createUnitState();
     const { warnings } = apply(state, 'UNIT BANANA PINEAPPLE', 60);
-    expect(state.length).toBe('FEET');
+    expect(state.length).toBe('FT');
     expect(state.force).toBe('KIP');
     expect(warnings).toHaveLength(1);
     expect(warnings[0].code).toBe(WARNING_CODES.MALFORMED_LINE);
@@ -133,7 +134,7 @@ describe('warning emission rules (D-06/D-07)', () => {
   it('a partially unrecognized unit line also leaves the state unchanged (validated aliases only)', () => {
     const state = createUnitState();
     const { warnings } = apply(state, 'UNIT METER PINEAPPLE', 61);
-    expect(state.length).toBe('FEET'); // METER alone must not apply — whole line validated first
+    expect(state.length).toBe('FT'); // METER alone must not apply — whole line validated first
     expect(state.force).toBe('KIP');
     expect(warnings[0].code).toBe(WARNING_CODES.MALFORMED_LINE);
   });
