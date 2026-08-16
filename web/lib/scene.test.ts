@@ -42,6 +42,7 @@ function makeSurveyModel(): StaadModel {
       [-0.05, 0.05],
     ],
     approximate: false,
+    family: "PRISMATIC",
   });
   return {
     nodes,
@@ -165,16 +166,20 @@ describe("SceneBuilder (REND-02 instancing + D-04/D-06)", () => {
     });
   });
 
-  it("(14) dispose drops mesh refs and leaves maps empty", () => {
+  it("(14) dispose drops mesh refs, empties maps, and dispatches geometry dispose", () => {
     const builder = new SceneBuilder();
     const model = makeSurveyModel();
     return builder.build(model, 15).then((result) => {
-      const uuid = result.meshes[0].geometry.uuid;
+      const geometry = result.meshes[0].geometry;
+      let disposed = false;
+      geometry.addEventListener("dispose", () => {
+        disposed = true;
+      });
       builder.dispose();
+      expect(disposed).toBe(true);
       expect(result.meshes.length).toBe(0);
       expect(result.instanceToMember.size).toBe(0);
       expect(result.memberToInstance.size).toBe(0);
-      expect(THREE.Cache?.enabled ?? true).toBe(true);
     });
   });
 
