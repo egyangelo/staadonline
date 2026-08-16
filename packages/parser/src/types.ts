@@ -86,6 +86,12 @@ export interface Support {
   releases: SupportReleases;
   /** Source line number the support was defined on (warning attribution). */
   line: number;
+  /**
+   * Optional restraint detail carried verbatim from the row (SPRING stiffness
+   * spec, e.g. 'FX 1000'). 01-07 Rule 2 addition — the plan requires
+   * SPRING "record type + note" but the D-03 shape had no note field.
+   */
+  note?: string;
 }
 
 export type LoadKind = 'MEMBER_LOAD' | 'JOINT_LOAD' | 'SELFWEIGHT' | 'ELEMENT_LOAD' | 'GENERATED';
