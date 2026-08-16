@@ -22,6 +22,7 @@ import { canonicalizeCommand, createContext, segmentBlocks } from '../../src/cor
 import { resolveHandler } from '../../src/staad/index';
 import { tokenize } from '../../src/tokenizer';
 import { WARNING_CODES } from '../../src/types';
+import type { Member } from '../../src/types';
 import type { CommandBlock, ParseContext } from '../../src/core';
 import { loadFixture } from '../fixtures/loadFixture';
 
@@ -87,6 +88,20 @@ describe('CONSTANTS handler (01-06 Task 3)', () => {
     expect(ctx.warnings).toHaveLength(1);
     expect(ctx.warnings[0].code).toBe(WARNING_CODES.MALFORMED_LINE);
     expect(ctx.warnings[0].line).toBe(1);
+  });
+
+  describe('Member.rotation contract (D-06)', () => {
+    it('Member may carry an optional rotation number (absent = no BETA recorded)', () => {
+      const rotated: Member = { id: 1, startNode: 10, endNode: 11, rotation: 90 };
+      const plain: Member = { id: 2, startNode: 20, endNode: 21 };
+      expect(rotated.rotation).toBe(90);
+      expect(plain.rotation).toBeUndefined();
+    });
+
+    it('existing Member literals still compile unchanged (optional field — no required-field breakage)', () => {
+      const member: Member = { id: 3, startNode: 30, endNode: 31 };
+      expect(member.rotation).toBeUndefined();
+    });
   });
 
   it('(5) real CONSTANTS slice parses through the production dispatch without warnings', () => {
