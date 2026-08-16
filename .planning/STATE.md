@@ -6,14 +6,14 @@ current_phase: 01
 current_phase_name: parser-model
 status: executing
 stopped_at: Completed 01-05-PLAN.md
-last_updated: "2026-08-16T12:14:19.444Z"
+last_updated: "2026-08-16T12:57:57.291Z"
 last_activity: 2026-08-15
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 01 (parser-model) — EXECUTING
-Plan: 7 of 9
+Plan: 8 of 9
 Status: Ready to execute
 Last activity: 2026-08-15 — Phase 01 execution started
 
@@ -60,6 +60,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-parser-model P4 | 11min | 3 tasks | 9 files |
 | Phase 01-parser-model P5 | 7min | 3 tasks | 8 files |
 | Phase 01-parser-model P6 | 257min | 7 tasks | 8 files |
+| Phase 01-parser-model P8 | 18 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,10 @@ Recent decisions affecting current work:
 - [Phase 01-parser-model]: Material names stored RAW as written (CONCRETE/STEEL_36_KSI uppercase in real file); Phase 3 normalizes for matching — Faithful to source; display data untrusted
 - [Phase 01-parser-model]: Member-list expansion passes maxRef = max member id (1490 in real file), not members.length (350) — member ids are non-contiguous — Count-based clamping would drop property links for ids 964..1490
 - [Phase 01-parser-model]: Named-section to member links happen at finalize via groups; 01-08 delivers the real START GROUP DEFINITION handler — Group-link mechanism proven at unit level; real-file group parse is a later plan
+- [Phase 01-parser-model]: LOAD COMB sign tokens (+/-) are term separators, not factor signs (GUI emits '- 1 DL + 1 H'); negative factors are negative numeric tokens — STAAD GUI combination syntax quirk verified in HPP_Main_Building_2.std
+- [Phase 01-parser-model]: Combination refs resolve to numeric case id when integer, else case-name string (DL/H/W/LL) — GUI emits names since combo ids differ from case ids
+- [Phase 01-parser-model]: JOINT LOAD axisRef always GLOBAL; MEMBER LOAD G-prefixed dirs GLOBAL, bare dirs LOCAL — Joints have no local axes; PITFALLS UX convention, T-08-04
+- [Phase 01-parser-model]: ELEMENT LOAD rows warn SKIPPED_ELEMENT per row with line (loads.ts); skipped.ts covers ELEMENT INCIDENCES/PROPERTY warn-once — D-07 requires line attribution
 
 ### Pending Todos
 
@@ -123,6 +128,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-16T12:14:19.432Z
+Last session: 2026-08-16T12:57:57.279Z
 Stopped at: Completed 01-05-PLAN.md
 Resume file: None
