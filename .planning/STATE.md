@@ -6,14 +6,14 @@ current_phase: 01
 current_phase_name: parser-model
 status: executing
 stopped_at: Completed 01-05-PLAN.md
-last_updated: "2026-08-16T07:45:14.330Z"
+last_updated: "2026-08-16T12:14:19.444Z"
 last_activity: 2026-08-15
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 9
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 01 (parser-model) — EXECUTING
-Plan: 6 of 9
+Plan: 7 of 9
 Status: Ready to execute
 Last activity: 2026-08-15 — Phase 01 execution started
 
@@ -59,6 +59,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-parser-model P3 | 12min | 3 tasks | 10 files |
 | Phase 01-parser-model P4 | 11min | 3 tasks | 9 files |
 | Phase 01-parser-model P5 | 7min | 3 tasks | 8 files |
+| Phase 01-parser-model P6 | 257min | 7 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,13 @@ Recent decisions affecting current work:
 - [Phase 01-parser-model]: Geometry handlers (joint-coordinates, member-incidences) keep a LOCAL Map seeded from ctx.nodes/ctx.members for dedupe + lookup — T-05-02 mitigation without adding Map fields to ParseContext
 - [Phase 01-parser-model]: Handler registration uses canonical keys only (JOINT COORDINATES, MEMBER INCIDENCES); P2 abbreviations (JNT COORD, MEMB INCI, MEMBER INCIDENCE) are canonicalized by COMMAND_ALIASES before dispatch so alias table keys are redundant
 - [Phase 01-parser-model]: Geometry test files live in test/staad/ (one level deeper than the existing suite) per plan layout — module imports resolve via ../../src/... not ../src/...
+- [Phase 01-parser-model]: MEMBER PROPERTY handler registers under the canonical key 'MEMBER PROPERTIES' (core.ts COMMAND_ALIASES maps PROPERTY to PROPERTIES); the plan's raw 'MEMBER PROPERTY' key could never match canonicalized headers — 01-04 established alias canonicalization; registration keys must use canonical pluralized forms
+- [Phase 01-parser-model]: Section labels: TABLE rows use the table section name; unnamed PRIS/PIPE rows use '_' + property text; named rows use the name itself; identical dims dedupe to one key — Dedupe + stable keys for downstream section map
+- [Phase 01-parser-model]: Approximate flag from resolveSectionProfile is the single source of truth driving the UNRESOLVED_SECTION warning — One mechanism, no duplicated resolution logic
+- [Phase 01-parser-model]: CONSTANTS handler registered under CONSTANTS, MATERIAL, and BETA keys; the real fixture's segmentation splits rows into their own blocks, so single-key registration silently loses materials — Real-file structure requires multi-key reachability
+- [Phase 01-parser-model]: Material names stored RAW as written (CONCRETE/STEEL_36_KSI uppercase in real file); Phase 3 normalizes for matching — Faithful to source; display data untrusted
+- [Phase 01-parser-model]: Member-list expansion passes maxRef = max member id (1490 in real file), not members.length (350) — member ids are non-contiguous — Count-based clamping would drop property links for ids 964..1490
+- [Phase 01-parser-model]: Named-section to member links happen at finalize via groups; 01-08 delivers the real START GROUP DEFINITION handler — Group-link mechanism proven at unit level; real-file group parse is a later plan
 
 ### Pending Todos
 
@@ -115,6 +123,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-16T07:45:14.319Z
+Last session: 2026-08-16T12:14:19.432Z
 Stopped at: Completed 01-05-PLAN.md
 Resume file: None

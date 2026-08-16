@@ -41,7 +41,7 @@ Plans:
 - [x] 01-03-PLAN.md — Golden-file fixture corpus (real + hand-written)
 - [x] 01-04-PLAN.md — Unit-state machine, block segmentation, parse core (TDD)
 - [x] 01-05-PLAN.md — JOINT COORDINATES + MEMBER INCIDENCES handlers
-- [ ] 01-06-PLAN.md — MEMBER PROPERTY, section resolver, CONSTANTS material
+- [x] 01-06-PLAN.md — MEMBER PROPERTY, section resolver, CONSTANTS material
 - [ ] 01-07-PLAN.md — SUPPORTS + GROUP DEFINITION handlers
 - [ ] 01-08-PLAN.md — LOAD cases, load items, tolerated commands
 - [ ] 01-09-PLAN.md — Production wiring + golden-file verification
