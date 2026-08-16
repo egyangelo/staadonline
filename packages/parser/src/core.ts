@@ -70,6 +70,8 @@ export interface ParseContext {
   supports: Support[];
   /** Load cases. */
   loadCases: LoadCase[];
+  /** Case that item handlers (SELFWEIGHT / MEMBER LOAD / JOINT LOAD) append to. */
+  currentLoadCase?: LoadCase;
   /** Named groups (group name → members/joints/elements). */
   groups: Map<string, Group>;
   /** Section name → profile lookups from property lines (01-06). */

@@ -103,12 +103,29 @@ export interface LoadItem {
   line: number;
 }
 
+/** Load-case class: a directly-specified primary case vs. a combination. */
+export type LoadCaseType = 'PRIMARY' | 'COMBINATION';
+
+/** One factor term of a LOAD COMB combination (ref = case name or numeric id). */
+export interface LoadCombinationTerm {
+  factor: number;
+  /** Referenced case NAME (e.g. 'DL', 'H') or numeric case id (D-04). */
+  ref: number | string;
+}
+
 export interface LoadCase {
   /** 1-based load case number from the .std file (D-04). */
   id: number;
   title: string;
   loadtype?: string;
+  /** Load items applied to the model (primary cases); [] for combinations. */
   items: LoadItem[];
+  /** PRIMARY (LOAD <n>) vs COMBINATION (LOAD COMB <n>). */
+  kind?: LoadCaseType;
+  /** Factor terms; present only for kind === 'COMBINATION'. */
+  terms?: LoadCombinationTerm[];
+  /** Force unit in effect when the case was declared (PITFALLS P1 display). */
+  forceUnit?: UnitForce;
 }
 
 export interface Group {
