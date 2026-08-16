@@ -33,12 +33,15 @@
  * every test proves the handler is registered under COMMAND_TABLE.
  */
 import { describe, expect, it } from 'vitest';
-import '../../src/index'; // UNIT/STAAD/geometry handlers (side-effect registration)
+import { parseStaad } from '../../src/index'; // UNIT/STAAD/geometry handlers (side-effect registration)
 import '../../src/staad/loads'; // LOAD-family handlers (side-effect registration)
+import '../../src/staad/skipped'; // tolerated-command registrations (side-effect)
 import { canonicalizeCommand, createContext, segmentBlocks } from '../../src/core';
 import { resolveHandler } from '../../src/staad/index';
 import { tokenize } from '../../src/tokenizer';
 import { WARNING_CODES } from '../../src/types';
+import { loadFixture } from '../fixtures/loadFixture';
+import { expected } from '../fixtures/manifest';
 import type { ParseContext } from '../../src/core';
 
 /** Run the production pipeline (segment → dispatch) over a deck string. */
@@ -223,5 +226,96 @@ describe('SELFWEIGHT / MEMBER LOAD / JOINT LOAD items (01-08 Task 2)', () => {
     const ctx = parse('SELFWEIGHT Y -1 LIST 1 TO 3');
     expect(ctx.loadCases).toHaveLength(0);
     expect(ctx.warnings.some((w) => w.code === WARNING_CODES.MALFORMED_LINE)).toBe(true);
+  });
+});
+
+describe('load mini-deck through parseStaad (01-08 Task 3)', () => {
+  const deck = `STAAD SPACE
+UNIT METER KN
+LOAD 1 LOADTYPE Dead TITLE D
+SELFWEIGHT Y -1 LIST 1 TO 3
+MEMBER LOAD
+1 TO 2 UNI GY -27.6
+ELEMENT LOAD
+4 TO 6 PR GY -28
+JOINT LOAD
+3 FY -123
+LOAD 2 LOADTYPE Live TITLE L
+JOINT LOAD
+7 FY -50
+LOAD COMB 100 COMB - 1 DL + 1 H
+PERFORM ANALYSIS
+`;
+
+  it('parses cases, items, and the combination end-to-end without throwing', () => {
+    let result!: ReturnType<typeof parseStaad>;
+    expect(() => {
+      result = parseStaad(deck);
+    }).not.toThrow();
+
+    expect(result.model.units.length).toBe('M');
+    expect(result.model.loadCases).toHaveLength(3);
+
+    const [d, l, comb] = result.model.loadCases;
+    expect(d).toMatchObject({ id: 1, title: 'D', loadtype: 'Dead', kind: 'PRIMARY', forceUnit: 'KN' });
+    // Case 1 gathers SELFWEIGHT + MEMBER LOAD + JOINT LOAD (LOAD 2 comes later).
+    expect(d.items).toHaveLength(3);
+    expect(d.items[0]).toMatchObject({ kind: 'SELFWEIGHT', axis: 'Y', axisRef: 'GLOBAL', magnitude: -1 });
+    expect(d.items[0].targets).toEqual([1, 2, 3]);
+    expect(d.items[1]).toMatchObject({ kind: 'MEMBER_LOAD', axis: 'Y', axisRef: 'GLOBAL', magnitude: -27.6 });
+    expect(d.items[1].targets).toEqual([1, 2]);
+    expect(d.items[2]).toMatchObject({ kind: 'JOINT_LOAD', axis: 'Y', axisRef: 'GLOBAL', magnitude: -123, targets: [3] });
+
+    expect(l).toMatchObject({ id: 2, title: 'L', kind: 'PRIMARY' });
+    expect(l.items).toHaveLength(1);
+    expect(l.items[0]).toMatchObject({ kind: 'JOINT_LOAD', axis: 'Y', axisRef: 'GLOBAL', magnitude: -50, targets: [7] });
+
+    expect(comb).toMatchObject({ id: 100, kind: 'COMBINATION' });
+    expect(comb.items).toEqual([]);
+    expect(comb.terms).toEqual([
+      { factor: 1, ref: 'DL' },
+      { factor: 1, ref: 'H' },
+    ]);
+
+    expect(result.warnings.some((w) => w.code === WARNING_CODES.SKIPPED_ELEMENT)).toBe(true);
+    expect(result.warnings.some((w) => w.code === WARNING_CODES.IGNORED_COMMAND)).toBe(true);
+  });
+});
+
+describe('real HPP load region (01-08 Task 3, D-09)', () => {
+  it('parses the load region into manifest-exact case counts', () => {
+    const text = loadFixture('real/HPP_Main_Building_2.std').replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    const lines = text.split('\n');
+
+    // Slice from the first LOAD case header (line 938, 'LOAD 13 LOADTYPE')
+    // through FINISH (line 1774) — the load region of the real file.
+    const start = lines.findIndex((l) => l.trim().startsWith('LOAD 13 LOADTYPE'));
+    const end = lines.findIndex((l) => l.trim() === 'FINISH');
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+
+    // The real file's units (UNIT METER KN, line 13) precede the slice —
+    // restore the unit context so forceUnit assertions hold.
+    const deck = ['UNIT METER KN', ...lines.slice(start, end + 1)].join('\n');
+
+    let result!: ReturnType<typeof parseStaad>;
+    expect(() => {
+      result = parseStaad(deck);
+    }).not.toThrow();
+
+    const c = expected['real/HPP_Main_Building_2.std'];
+    expect(result.model.loadCases).toHaveLength(c.loadCases); // 288
+    expect(result.model.loadCases.filter((lc) => lc.kind === 'PRIMARY')).toHaveLength(c.loadPrimary); // 14
+    expect(result.model.loadCases.filter((lc) => lc.kind === 'COMBINATION')).toHaveLength(c.loadComb); // 274
+    expect(result.model.loadCases.every((lc) => lc.forceUnit === 'KN')).toBe(true);
+    expect(result.model.units.length).toBe('M');
+
+    // Spot checks against the real file content.
+    expect(result.model.loadCases.find((lc) => lc.id === 1)).toMatchObject({ title: 'D', loadtype: 'Dead' });
+    expect(result.model.loadCases.find((lc) => lc.id === 12)).toMatchObject({ title: 'H (H)', loadtype: 'Soil' });
+
+    expect(result.warnings.some((w) => w.code === WARNING_CODES.SKIPPED_ELEMENT)).toBe(true);
+    expect(result.warnings.some((w) => w.code === WARNING_CODES.UNKNOWN_COMMAND)).toBe(true);
+    expect(result.warnings.some((w) => w.code === WARNING_CODES.IGNORED_COMMAND)).toBe(true);
   });
 });
