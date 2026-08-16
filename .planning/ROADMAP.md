@@ -13,7 +13,7 @@ From empty repo to shipped viewer in four dependency-ordered phases: first a tol
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Parser & Model** - Tolerant headless `.std` parser, typed StaadModel, golden-file corpus
+- [x] **Phase 1: Parser & Model** - Tolerant headless `.std` parser, typed StaadModel, golden-file corpus (completed 2026-08-16)
 - [ ] **Phase 2: File Opening & 3D Rendering** - Open `.std` and render the 3D analytical model instanced
 - [ ] **Phase 3: Interaction & Visualization** - Color modes, supports/loads markers, member inspection, summary
 - [ ] **Phase 4: Native Packaging & Performance** - Capacitor Android app, offline, worker parse
@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Unknown or version-drifted commands are skipped with collected warnings, never fatal; free-format grammar (semicolons, `*` comments, `" -"` continuations, abbreviations, trailing-dot floats) is handled.
   4. The parser produces a typed model (nodes, members, sections, supports, loads, groups, bounds) with zero DOM/Three imports — headless, unit-testable, worker-ready.
 
-**Plans**: 7/9 plans executed
+**Plans**: 9/9 plans complete
 
 Plans:
 
@@ -44,7 +44,7 @@ Plans:
 - [x] 01-06-PLAN.md — MEMBER PROPERTY, section resolver, CONSTANTS material
 - [x] 01-07-PLAN.md — SUPPORTS + GROUP DEFINITION handlers
 - [x] 01-08-PLAN.md — LOAD cases, load items, tolerated commands
-- [ ] 01-09-PLAN.md — Production wiring + golden-file verification
+- [x] 01-09-PLAN.md — Production wiring + golden-file verification
 
 ### Phase 2: File Opening & 3D Rendering
 
@@ -99,7 +99,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Parser & Model | 7/9 | In Progress|  |
+| 1. Parser & Model | 9/9 | Complete   | 2026-08-16 |
 | 2. File Opening & 3D Rendering | TBD | Not started | - |
 | 3. Interaction & Visualization | TBD | Not started | - |
 | 4. Native Packaging & Performance | TBD | Not started | - |
