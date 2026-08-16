@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: STAAD Online Viewer
 status: verifying
-last_updated: "2026-08-16T18:47:17.077Z"
+last_updated: "2026-08-16T19:08:52.131Z"
 last_activity: 2026-08-16 — Phase 1 complete, transitioned to Phase 2
 progress:
   total_phases: 4
@@ -25,11 +25,23 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 2 — File Opening & 3D Rendering
-Plan: Not started
+Plan: 7 plans ready — planning complete
 Status: Phase complete — ready for verification
-Last activity: 2026-08-16 — Phase 1 complete, transitioned to Phase 2
+Last activity: 2026-08-16 — Phase 2 planning complete (7 PLANS written, wave order assigned)
 
 Progress: [███░░░░░░░] 33%
+
+### Phase 2 execution waves (for the executor)
+
+| Wave | Plan | Depends on | Area |
+|------|------|-----------|------|
+| 1 | 02-01 | — | parser extension: BETA/MEMBER rotation |
+| 1 | 02-02 | — | foundation: 3D deps + FileService + stores |
+| 2 | 02-03 | 02-02 | section DB + geometry factories |
+| 2 | 02-06 | 02-02 | chrome components (stats/toasts/overlays) |
+| 3 | 02-04 | 02-02, 02-03 | SceneBuilder (rebase/instancing/camera-fit) |
+| 4 | 02-05 | 02-02, 02-04 | ViewerCanvas (canvas, controls, auto-fit) |
+| 5 | 02-07 | 02-02, 02-05, 02-06 | page integration + tokens + end-of-phase verify |
 
 ## Performance Metrics
 
@@ -132,6 +144,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-16T18:47:17.066Z
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-file-opening-3d-rendering/02-CONTEXT.md
+Last session: 2026-08-16T19:08:52.120Z
+Stopped at: Phase 2 UI-SPEC approved
+Resume file: .planning/phases/02-file-opening-3d-rendering/02-UI-SPEC.md
