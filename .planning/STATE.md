@@ -6,14 +6,14 @@ current_phase: 01
 current_phase_name: parser-model
 status: executing
 stopped_at: Completed 01-05-PLAN.md
-last_updated: "2026-08-16T12:57:57.291Z"
+last_updated: "2026-08-16T13:29:29.062Z"
 last_activity: 2026-08-15
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 01 (parser-model) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Status: Ready to execute
 Last activity: 2026-08-15 — Phase 01 execution started
 
@@ -61,6 +61,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-parser-model P5 | 7min | 3 tasks | 8 files |
 | Phase 01-parser-model P6 | 257min | 7 tasks | 8 files |
 | Phase 01-parser-model P8 | 18 | 3 tasks | 5 files |
+| Phase 01-parser-model P07 | 16min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,9 @@ Recent decisions affecting current work:
 - [Phase 01-parser-model]: Combination refs resolve to numeric case id when integer, else case-name string (DL/H/W/LL) — GUI emits names since combo ids differ from case ids
 - [Phase 01-parser-model]: JOINT LOAD axisRef always GLOBAL; MEMBER LOAD G-prefixed dirs GLOBAL, bare dirs LOCAL — Joints have no local axes; PITFALLS UX convention, T-08-04
 - [Phase 01-parser-model]: ELEMENT LOAD rows warn SKIPPED_ELEMENT per row with line (loads.ts); skipped.ts covers ELEMENT INCIDENCES/PROPERTY warn-once — D-07 requires line attribution
+- [Phase 01-parser-model]: FIXED BUT <dofs>: listed DOFs are RELEASED (true) per types.ts contract (true = released); plan's literal {FY:false,MZ:false} was a typo — Consistency with the shared SupportReleases contract; mini-deck asserts same
+- [Phase 01-parser-model]: SPRING supports record type SPRING + verbatim stiffness note (Support.note, new optional field) — Rule 2: D-03 shape had no note field but plan requires record type + note
+- [Phase 01-parser-model]: ELEMENT group rows stored AND warned SKIPPED_ELEMENT (D-07) so downstream linking never reports UNRESOLVED_SECTION for defined groups — Group must exist for core.ts finalize/member-property linking
 
 ### Pending Todos
 
@@ -128,6 +132,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-16T12:57:57.279Z
+Last session: 2026-08-16T13:28:43.034Z
 Stopped at: Completed 01-05-PLAN.md
 Resume file: None
