@@ -146,10 +146,11 @@ describe('MEMBER PROPERTY handler (01-06 Task 2)', () => {
     ctx.units.length = 'M'; // the real file declares UNIT METER KN before MEMBER PROPERTY
     dispatchDeck(ctx, deck);
 
-    // 17 named PRIS rows (lines 800-819 minus the 3 ranged rows), 3 unique
-    // ranged PRIS sections, 2 TABLE fallbacks (IPE 300, 12CS3.5X105).
+    // 17 named PRIS rows (lines 800-819 minus the 3 ranged rows); 4 unique
+    // ranged PRIS sections (0.5/0.25, 0.6/0.3, 0.05/0.05, 0.2/0.2) and 2
+    // TABLE fallbacks (IPE 300, 12CS3.5X105) → 6 sections total.
     expect(ctx.namedSections.size).toBe(17);
-    expect(ctx.sections.size).toBe(5);
+    expect(ctx.sections.size).toBe(6);
     expect(ctx.sections.get('IPE 300')).toBeDefined();
     expect(ctx.sections.get('IPE 300')!.approximate).toBe(true);
     expect(ctx.sections.get('12CS3.5X105')).toBeDefined();
