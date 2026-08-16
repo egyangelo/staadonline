@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { MAX_INPUT_LENGTH, parseStaad, registerParsingCommands } from '../src/index';
-import { registerCommand, type CommandHandler } from '../src/staad/index';
-import { toMeters } from '../src/resolve-units';
-import type { ParseContext } from '../src/core';
 import { WARNING_CODES } from '../src/types';
 import { expected } from './fixtures/manifest';
 import { loadFixture } from './fixtures/loadFixture';
@@ -36,12 +33,13 @@ function countJointRows(text: string): number {
 }
 
 /**
- * End-to-end parseStaad contract (01-04):
- * - (1) the real corpus fixture parses WITHOUT throwing using only the
- *       core-state handlers (+ this test's JOINT COORDINATES stub): UNIT and
- *       STAAD run through the real COMMAND_TABLE, unknown blocks become
- *       UNKNOWN_COMMAND warnings, unit state lands in the model, bounds are
- *       computed, node 2 is at y = -2.8 (key_context).
+ * End-to-end parseStaad contract (01-04/01-05):
+ * - (1) the real corpus fixture parses WITHOUT throwing using the production
+ *       handlers: UNIT and STAAD run through the real COMMAND_TABLE,
+ *       JOINT COORDINATES / MEMBER INCIDENCES (01-05) populate nodes and
+ *       members, unknown blocks become UNKNOWN_COMMAND warnings, unit state
+ *       lands in the model, bounds are computed, node 2 is at y = -2.8
+ *       (key_context), and member rows match the manifest count.
  * - (2) empty input → empty model, no warnings, P1 defaults.
  * - (3) STAAD PLANE + 2-coordinate rows → z = 0, no MALFORMED_LINE
  *       (checker #3 D-02 2D coverage).
@@ -49,63 +47,16 @@ function countJointRows(text: string): number {
  * - (5) size guard: oversized input returns a warning result, never throws
  *       (T-04-01).
  *
- * NOTE: JOINT COORDINATES has no production handler in 01-04 (it arrives in
- * 01-05). This file registers a test-local stub so the pipeline's structure
- * and unit-state behavior are provable end-to-end NOW. The stub normalizes
- * coordinates through toMeters using the running unit state — the same
- * contract the 01-05 handler must implement.
+ * NOTE: the test-local JOINT COORDINATES stub that 01-04 registered here was
+ * REMOVED in 01-05 — the production handler (staad/joint-coordinates.ts) now
+ * registers into the real COMMAND_TABLE via the src/index import graph, and
+ * this file exercises it end-to-end instead of shadowing it.
  */
 
-// Production core-state handlers (UNIT, STAAD) register when '../src/index'
-// is imported above. Call the bootstrap to keep the registration surface
-// explicit, then add the geometry stub.
+// Production core-state + geometry handlers (UNIT, STAAD, JOINT COORDINATES,
+// MEMBER INCIDENCES) register when '../src/index' is imported above. Call the
+// bootstrap to keep the registration surface explicit.
 registerParsingCommands();
-
-const stubJointCoordinates: CommandHandler = (ctx: ParseContext, block) => {
-  for (const entry of block.bodyLines) {
-    const t = entry.tokens.map((tok) => tok.text);
-    const id = Number(t[0]);
-    const x = Number(t[1]);
-    const y = Number(t[2]);
-    if (t.length < 3 || !Number.isFinite(id) || !Number.isFinite(x) || !Number.isFinite(y)) {
-      ctx.warnings.push({
-        code: WARNING_CODES.MALFORMED_LINE,
-        message: `Malformed joint row: ${t.join(' ')}`,
-        line: entry.line,
-        severity: 'warning',
-      });
-      continue;
-    }
-    const zTok = t[3];
-    if (zTok === undefined) {
-      if (ctx.structure === 'SPACE') {
-        ctx.warnings.push({
-          code: WARNING_CODES.MALFORMED_LINE,
-          message: `Joint ${id} is missing the z coordinate (structure ${ctx.structure})`,
-          line: entry.line,
-          severity: 'warning',
-        });
-        continue;
-      }
-      // PLANE / FRAME: 2D row — z = 0 (checker #3).
-      ctx.nodes.push({ id, x: toMeters(x, ctx.units), y: toMeters(y, ctx.units), z: 0 });
-      continue;
-    }
-    const z = Number(zTok);
-    if (!Number.isFinite(z)) {
-      ctx.warnings.push({
-        code: WARNING_CODES.MALFORMED_LINE,
-        message: `Malformed joint row: ${t.join(' ')}`,
-        line: entry.line,
-        severity: 'warning',
-      });
-      continue;
-    }
-    ctx.nodes.push({ id, x: toMeters(x, ctx.units), y: toMeters(y, ctx.units), z: toMeters(z, ctx.units) });
-  }
-};
-
-registerCommand(['JOINT COORDINATES', 'JNT COORD'], stubJointCoordinates);
 
 describe('parseStaad — public entry (01-04)', () => {
   it('(1) parses the real HPP fixture without throwing; units M/KN, bounds, node 2 y = -2.8', () => {
@@ -129,10 +80,10 @@ describe('parseStaad — public entry (01-04)', () => {
       expect(Number.isFinite(v)).toBe(true);
     }
 
-    // The geometry stub parsed every joint ROW of the corpus (1122 rows;
-    // ids are non-contiguous so max id is 1222) and normalized coordinates
-    // through the running unit state: node 2 = (0, -2.8, 0) — key_context
-    // exact value, METER factor 1.
+    // The production geometry handler (01-05) parsed every joint ROW of the
+    // corpus (1122 rows; ids are non-contiguous so max id is 1222) and
+    // normalized coordinates through the running unit state: node 2 =
+    // (0, -2.8, 0) — key_context exact value, METER factor 1.
     expect(result.model.nodes).toHaveLength(countJointRows(text));
     const maxId = result.model.nodes.reduce((m, n) => (n.id > m ? n.id : m), 0);
     expect(maxId).toBe(expected['real/HPP_Main_Building_2.std'].joints); // 1222, manifest-computed
@@ -142,6 +93,11 @@ describe('parseStaad — public entry (01-04)', () => {
     expect(node2?.y).toBe(-2.8);
     expect(node2?.z).toBe(0);
     expect(result.model.bounds.min[1]).toBeLessThanOrEqual(-2.8);
+
+    // MEMBER INCIDENCES (production handler) populated the model: exact
+    // manifest-computed member count with 1-based source ids preserved (D-04).
+    expect(result.model.members).toHaveLength(expected['real/HPP_Main_Building_2.std'].members);
+    expect(result.model.members.find((m) => m.id === 1)).toEqual({ id: 1, startNode: 1, endNode: 739 });
   });
 
   it('(2) parses empty input into an empty model with P1 defaults and no warnings', () => {
