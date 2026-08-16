@@ -105,3 +105,32 @@ export function parseStaad(text: string): ParseResult {
 
   return { model: finalize(ctx), warnings: ctx.warnings };
 }
+
+export type {
+  Bounds,
+  Group,
+  LoadAxis,
+  LoadAxisRef,
+  LoadCase,
+  LoadCaseType,
+  LoadCombinationTerm,
+  LoadItem,
+  LoadKind,
+  Member,
+  Node,
+  ParseResult,
+  ParseWarning,
+  SectionFamily,
+  SectionMeta,
+  SectionProfile,
+  StaadModel,
+  Support,
+  SupportReleases,
+  SupportType,
+  UnitForce,
+  UnitLength,
+  UnitSystem,
+  WarningCode,
+  WarningSeverity,
+} from './types';
+export { WARNING_CODES } from './types';

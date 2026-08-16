@@ -1,0 +1,10 @@
+{
+  "name": "staad-online",
+  "version": "0.1.0",
+  "private": true,
+  "description": "STAAD Online — open a STAAD .std file and view the 3D analytical model on any device",
+  "workspaces": [
+    "packages/*",
+    "web"
+  ]
+}
