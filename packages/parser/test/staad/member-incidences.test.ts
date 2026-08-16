@@ -93,4 +93,32 @@ describe('MEMBER INCIDENCES handler (01-05)', () => {
     expect(ctx.warnings[0].code).toBe(WARNING_CODES.MALFORMED_LINE);
     expect(ctx.warnings[0].line).toBe(2);
   });
+
+  it('(8) multi-group row (`3 3 1 4 1 2`) parses two members — the continuation-merge shape', () => {
+    // A `" -"` continuation merge folds two physical rows into one entry
+    // (01-09 fixture continuations.std). STAAD semantics: member 3: 3→1
+    // AND member 4: 1→2 — the multi-group reading, not a maximal-list of
+    // four members with one pair.
+    const ctx = createContext();
+    memberIncidencesHandler(ctx, memberBlock('3 3 1 4 1 2'));
+    expect(ctx.members).toEqual([
+      { id: 3, startNode: 3, endNode: 1 },
+      { id: 4, startNode: 1, endNode: 2 },
+    ]);
+    expect(ctx.warnings).toEqual([]);
+  });
+
+  it('(9) multi-group falls back to maximal-list when trailing tokens cannot form a group', () => {
+    // The 01-05 maximal-list decision still holds: `5 TO 7 10 20 100 200`
+    // is ONE group (members 5,6,7,10,20 → pair 100,200); the greedy
+    // multi-group reading leaves `100 200` unconsumed and is rejected.
+    const ctx = createContext();
+    memberIncidencesHandler(ctx, memberBlock('5 TO 7 10 20 100 200'));
+    expect(ctx.members.map((m) => m.id)).toEqual([5, 6, 7, 10, 20]);
+    for (const m of ctx.members) {
+      expect(m.startNode).toBe(100);
+      expect(m.endNode).toBe(200);
+    }
+    expect(ctx.warnings).toEqual([]);
+  });
 });

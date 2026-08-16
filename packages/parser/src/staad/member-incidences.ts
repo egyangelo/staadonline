@@ -5,12 +5,16 @@
  * - each entry is `member-list start-node end-node [specifiers...]` — the
  *   real HPP fixture shape is `1 1 739; 2 3 610;` (semicolon-packed entries
  *   already arrived as separate TokenizedLine entries);
+ * - a row may define MULTIPLE members: STAAD accepts repeated
+ *   `list i j` groups on one logical row (`3 3 1 4 1 2` = member 3: 3→1
+ *   AND member 4: 1→2) — which is exactly what a `" -"` continuation merge
+ *   produces (01-09 fixture continuations.std). The row splitter tries the
+ *   multi-group reading FIRST (minimal lists, left-to-right); when trailing
+ *   tokens cannot form a complete group it falls back to the 01-05
+ *   MAXIMAL-LIST single-group reading (`5 TO 7 10 20 100 200` → members
+ *   5,6,7,10,20 with pair (100, 200));
  * - the member list is expanded via `expandList` (P2 list syntax: bare ids,
  *   `TO` ranges, `BY` steps — bounded per threat T-05-01);
- * - the node pair is the pair of numeric tokens immediately after the
- *   MAXIMAL member list: for `5 TO 7 10 20 100 200` the list is
- *   `5 TO 7 10 20` (→ members 5,6,7,10,20) and the pair is (100, 200);
- *   for `3 5 6 BETA 90` the maximal list is just `3` and the pair is (5, 6);
  * - 1-based source ids are preserved (D-04);
  * - trailing specifiers (BETA angle, ...) are tolerated, never fatal (P2).
  *
@@ -33,34 +37,72 @@ import { expandList, listItemLength, parseListId } from './lists';
 import { WARNING_CODES, type Member } from '../types';
 import { registerCommand } from './index';
 
-/**
- * Split a member row's tokens into { member-list slice, startNode, endNode }.
- *
- * The list is the maximal prefix of list items (scanned via `listItemLength`)
- * that still leaves a valid numeric node pair immediately after it. Returns
- * null when no such split exists (malformed row).
- */
-function splitMemberRow(
-  tokens: readonly string[],
-): { list: string[]; startNode: number; endNode: number } | null {
-  let bestEnd = -1;
+/** One `list i j` group extracted from a member row. */
+interface MemberRowGroup {
+  list: string[];
+  startNode: number;
+  endNode: number;
+}
 
+/**
+ * Split a member row's tokens into one or more (member-list, node-pair)
+ * groups. Two strategies, in order:
+ *
+ * 1. Greedy multi-group (left-to-right, MINIMAL one-item lists): consume
+ *    `list-item i j` groups while every group is complete. STAAD allows
+ *    repeated definitions on one logical row — the `" -"` continuation
+ *    merge (`3 3 1 4 1 2` → member 3: 3→1, member 4: 1→2) is this shape.
+ *    If the ENTIRE token stream is consumed → use these groups.
+ * 2. Maximal-list single-group (the 01-05 documented decision for rows like
+ *    `5 TO 7 10 20 100 200` → members 5,6,7,10,20 with pair (100, 200)):
+ *    when strategy 1 leaves unconsumed tokens (or no complete group), the
+ *    list is the maximal prefix of list items that still leaves a valid
+ *    numeric node pair immediately after it.
+ *
+ * Returns null when neither strategy finds a valid split (malformed row).
+ */
+function splitMemberRow(tokens: readonly string[]): MemberRowGroup[] | null {
+  // Strategy 1: greedy minimal-list multi-group (left-to-right).
+  const groups: MemberRowGroup[] = [];
   let i = 0;
+  let complete = true;
   while (i < tokens.length) {
     const len = listItemLength(tokens, i);
+    const a = parseListId(tokens[i + len]);
+    const b = parseListId(tokens[i + len + 1]);
+    if (len === 0 || a === null || b === null) {
+      complete = false;
+      break;
+    }
+    groups.push({ list: tokens.slice(i, i + len), startNode: a, endNode: b });
+    i += len + 2;
+  }
+  if (complete && groups.length > 0) return groups;
+
+  // Strategy 2: maximal-list single-group (01-05 decision).
+  let bestEnd = -1;
+  let j = 0;
+  while (j < tokens.length) {
+    const len = listItemLength(tokens, j);
     if (len === 0) break; // list items are contiguous at the row start
-    const next = i + len;
+    const next = j + len;
     const a = parseListId(tokens[next]);
     const b = parseListId(tokens[next + 1]);
     if (a !== null && b !== null) bestEnd = next; // valid node pair follows this item
-    i = next;
+    j = next;
   }
 
   if (bestEnd === -1) return null;
   const startNode = parseListId(tokens[bestEnd]);
   const endNode = parseListId(tokens[bestEnd + 1]);
   // startNode/endNode are guaranteed non-null by the scan above.
-  return { list: tokens.slice(0, bestEnd), startNode: startNode as number, endNode: endNode as number };
+  return [
+    {
+      list: tokens.slice(0, bestEnd),
+      startNode: startNode as number,
+      endNode: endNode as number,
+    },
+  ];
 }
 
 export function memberIncidencesHandler(ctx: ParseContext, block: CommandBlock): void {
@@ -70,9 +112,9 @@ export function memberIncidencesHandler(ctx: ParseContext, block: CommandBlock):
 
   for (const entry of block.bodyLines) {
     const tokens = entry.tokens.map((tok) => tok.text);
-    const row = splitMemberRow(tokens);
+    const groups = splitMemberRow(tokens);
 
-    if (row === null) {
+    if (groups === null) {
       ctx.warnings.push({
         code: WARNING_CODES.MALFORMED_LINE,
         message: `Malformed member row: ${tokens.join(' ')}`,
@@ -82,21 +124,23 @@ export function memberIncidencesHandler(ctx: ParseContext, block: CommandBlock):
       continue;
     }
 
-    // Trailing tokens beyond startNode/endNode (BETA, ...) are tolerated (P2).
-    const ids = expandList(row.list);
-    for (const id of ids) {
-      if (memberById.has(id)) {
-        ctx.warnings.push({
-          code: WARNING_CODES.MALFORMED_LINE,
-          message: `Duplicate member id ${id} — keeping the first occurrence`,
-          line: entry.line,
-          severity: 'warning',
-        });
-        continue;
+    for (const row of groups) {
+      // Trailing specifiers beyond each group (BETA, ...) are tolerated (P2).
+      const ids = expandList(row.list);
+      for (const id of ids) {
+        if (memberById.has(id)) {
+          ctx.warnings.push({
+            code: WARNING_CODES.MALFORMED_LINE,
+            message: `Duplicate member id ${id} — keeping the first occurrence`,
+            line: entry.line,
+            severity: 'warning',
+          });
+          continue;
+        }
+        const member: Member = { id, startNode: row.startNode, endNode: row.endNode };
+        memberById.set(id, member);
+        ctx.members.push(member);
       }
-      const member: Member = { id, startNode: row.startNode, endNode: row.endNode };
-      memberById.set(id, member);
-      ctx.members.push(member);
     }
   }
 }
