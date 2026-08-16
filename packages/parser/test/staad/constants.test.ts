@@ -9,8 +9,10 @@
  *   segmentation splits `MATERIAL CONCRETE MEMB ...` into its own block, so
  *   the row must be read from the header entry tokens PLUS any digit-starting
  *   continuation body lines).
- * - BETA rows (`BETA 90 MEMB ...`) are tolerated and ignored WITHOUT a
- *   warning (valid STAAD, not unknown).
+ * - BETA rows (`BETA <angle> MEMB <list>`) record the angle (degrees) as
+ *   `member.rotation` on every member in the expanded list (D-06) — through
+ *   BOTH dispatch paths — while never warning on valid rows; malformed BETA
+ *   rows warn MALFORMED_LINE with the source line.
  * - Malformed MATERIAL rows (non-numeric member list) warn MALFORMED_LINE
  *   with the source line, never a throw.
  * - The real CONSTANTS slice (lines 835-849) parses without MALFORMED_LINE
@@ -74,11 +76,13 @@ describe('CONSTANTS handler (01-06 Task 3)', () => {
     expect(ctx.warnings).toEqual([]);
   });
 
-  it('(3) BETA rows are tolerated and ignored without warnings (valid STAAD)', () => {
+  it('(3) BETA rows record member rotation without warnings (D-06)', () => {
     const ctx = createContext();
     seedMembers(ctx, [1, 2]);
     constantsHandler(ctx, block('BETA 90 MEMB 1 TO 2', ''));
     expect(ctx.members.every((m) => m.material === undefined)).toBe(true);
+    expect(ctx.members.find((m) => m.id === 1)?.rotation).toBe(90);
+    expect(ctx.members.find((m) => m.id === 2)?.rotation).toBe(90);
     expect(ctx.warnings).toEqual([]);
   });
 
@@ -102,6 +106,43 @@ describe('CONSTANTS handler (01-06 Task 3)', () => {
       const member: Member = { id: 3, startNode: 30, endNode: 31 };
       expect(member.rotation).toBeUndefined();
     });
+  });
+
+  it('(6) negative BETA angle records a negative rotation (D-06)', () => {
+    const ctx = createContext();
+    seedMembers(ctx, [1, 2]);
+    constantsHandler(ctx, block('BETA -45 MEMB 2', ''));
+    expect(ctx.members.find((m) => m.id === 2)?.rotation).toBe(-45);
+    expect(ctx.members.find((m) => m.id === 1)?.rotation).toBeUndefined();
+    expect(ctx.warnings).toEqual([]);
+  });
+
+  it('(7) members without a BETA row keep rotation undefined (D-06)', () => {
+    const ctx = createContext();
+    seedMembers(ctx, [1, 2, 3]);
+    constantsHandler(ctx, block('BETA 90 MEMB 1', ''));
+    expect(ctx.members.find((m) => m.id === 1)?.rotation).toBe(90);
+    expect(ctx.members.find((m) => m.id === 2)?.rotation).toBeUndefined();
+    expect(ctx.members.find((m) => m.id === 3)?.rotation).toBeUndefined();
+  });
+
+  it('(8) malformed BETA row (non-finite angle) warns MALFORMED_LINE, never throws (D-06)', () => {
+    const ctx = createContext();
+    seedMembers(ctx, [1]);
+    expect(() => constantsHandler(ctx, block('BETA X MEMB 1', ''))).not.toThrow();
+    expect(ctx.warnings).toHaveLength(1);
+    expect(ctx.warnings[0].code).toBe(WARNING_CODES.MALFORMED_LINE);
+    expect(ctx.warnings[0].line).toBe(1);
+    expect(ctx.members[0].rotation).toBeUndefined();
+  });
+
+  it('(9) BETA row missing MEMB marker warns MALFORMED_LINE (D-06)', () => {
+    const ctx = createContext();
+    seedMembers(ctx, [1]);
+    constantsHandler(ctx, block('BETA 90', ''));
+    expect(ctx.warnings).toHaveLength(1);
+    expect(ctx.warnings[0].code).toBe(WARNING_CODES.MALFORMED_LINE);
+    expect(ctx.warnings[0].line).toBe(1);
   });
 
   it('(5) real CONSTANTS slice parses through the production dispatch without warnings', () => {
