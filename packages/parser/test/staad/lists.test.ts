@@ -13,7 +13,7 @@
  * ranges expand to nothing.
  */
 import { describe, expect, it } from 'vitest';
-import { expandList, LIST_HARD_CAP, listItemLength } from '../src/staad/lists';
+import { expandList, LIST_HARD_CAP, listItemLength } from '../../src/staad/lists';
 
 describe('expandList — member-list range expansion (01-05)', () => {
   it('expands explicit ids: "1 2 3" → [1,2,3]', () => {
