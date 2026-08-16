@@ -30,6 +30,8 @@ export interface FixtureCounts {
   elements: number;
   /** Named group entries in START GROUP DEFINITION (between START and END markers). */
   groups: number;
+  /** Expanded joint ids in SUPPORTS rows (sum of numeric-prefix words, plates excluded). */
+  supports: number;
   /** Primary load-case headers: lines `LOAD <numeric id> LOADTYPE`. */
   loadPrimary: number;
   /** Load-combination records: lines `LOAD COMB <id>`. */
@@ -199,6 +201,36 @@ export function detectUnit(text: string): { length: string; force: string } {
   return { length: '', force: '' };
 }
 
+/**
+ * Count expanded joint ids inside the SUPPORTS block. Each data line is a
+ * joint list + restraint keyword (e.g. `14 16 18 20 22 24 1118 1121 PINNED`);
+ * the count is the sum of all-digit words per non-plate row. Plate rows
+ * (leading group-name `_` token + PLATE marker) are excluded — they produce
+ * no Support records (D-07). Ranges (`1 TO 5`) are not used in the corpus's
+ * SUPPORTS blocks (verified against the real file and all hand-written
+ * fixtures) — the helper counts literal ids only, matching the parser's
+ * expansion for these fixtures.
+ */
+export function countSupports(text: string): number {
+  const lines = normalizeLines(text);
+  const start = lines.findIndex((l) => l.trim().startsWith('SUPPORTS'));
+  if (start === -1) return 0; // no SUPPORTS block → no supports (fixtures without supports)
+  let count = 0;
+  for (let i = start + 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.length === 0 || line.startsWith('*')) continue;
+    if (isCommandHeader(line)) break; // next command block
+    for (const entry of line.split(';')) {
+      const words = splitWords(entry.trim());
+      if (words.length === 0 || isDigits(words[0]) === false) continue; // plate rows, `_` group refs
+      for (const w of words) {
+        if (isDigits(w)) count++;
+      }
+    }
+  }
+  return count;
+}
+
 /** Compute the full count set for a fixture text (used for the real file). */
 export function computeRealCounts(text: string): FixtureCounts {
   const loadPrimary = countLoadPrimary(text);
@@ -208,6 +240,7 @@ export function computeRealCounts(text: string): FixtureCounts {
     members: countMemberRows(text),
     elements: countElementRows(text),
     groups: countGroupEntries(text),
+    supports: countSupports(text),
     loadPrimary,
     loadComb,
     loadCases: loadPrimary + loadComb,
@@ -234,6 +267,7 @@ export const expectedHandwritten: Record<string, FixtureCounts> = {
     members: 2,
     elements: 0,
     groups: 0,
+    supports: 2, // `1 2 PINNED`
     loadPrimary: 0,
     loadComb: 0,
     loadCases: 0,
@@ -244,6 +278,7 @@ export const expectedHandwritten: Record<string, FixtureCounts> = {
     members: 2,
     elements: 0,
     groups: 0,
+    supports: 0, // no SUPPORTS block
     loadPrimary: 0,
     loadComb: 0,
     loadCases: 0,
@@ -254,6 +289,7 @@ export const expectedHandwritten: Record<string, FixtureCounts> = {
     members: 2,
     elements: 0,
     groups: 0,
+    supports: 0, // no SUPPORTS block
     loadPrimary: 0,
     loadComb: 0,
     loadCases: 0,
@@ -264,6 +300,7 @@ export const expectedHandwritten: Record<string, FixtureCounts> = {
     members: 4, // entries 1, 2, and the `3 3 1 -` + `4 1 2` continuation-merged row (2 members in 1 entry)
     elements: 0,
     groups: 0,
+    supports: 3, // `1 2 3 PINNED`
     loadPrimary: 0,
     loadComb: 0,
     loadCases: 0,
@@ -274,6 +311,7 @@ export const expectedHandwritten: Record<string, FixtureCounts> = {
     members: 1, // FROBNICATE block (header + body) is skipped with a warning — only `1 1 2` counts
     elements: 0,
     groups: 0,
+    supports: 2, // `1 2 PINNED`
     loadPrimary: 0,
     loadComb: 0,
     loadCases: 0,

@@ -7,8 +7,8 @@
  * - Manifest (D-09) is complete: expectedReal positive, expectedHandwritten
  *   covers all 5 hand-written names
  * - Ground-truth spot checks on the real file (checker-verified counts:
- *   1222 joints / 350 members / 938 elements / 40 groups / 14 primary /
- *   274 comb / 288 total loads, unit METER KN)
+ *   1222 joints / 350 members / 938 elements / 40 groups / 8 PINNED
+ *   supports / 14 primary / 274 comb / 288 total loads, unit METER KN)
  */
 import { describe, expect, it } from 'vitest';
 
@@ -51,6 +51,7 @@ describe('manifest (D-09 expected counts)', () => {
     expect(isPositiveInteger(c.members)).toBe(true);
     expect(isPositiveInteger(c.elements)).toBe(true);
     expect(isPositiveInteger(c.groups)).toBe(true);
+    expect(isPositiveInteger(c.supports)).toBe(true);
     expect(isPositiveInteger(c.loadPrimary)).toBe(true);
     expect(isPositiveInteger(c.loadComb)).toBe(true);
     expect(isPositiveInteger(c.loadCases)).toBe(true);
@@ -62,6 +63,7 @@ describe('manifest (D-09 expected counts)', () => {
     expect(c.members).toBe(350);
     expect(c.elements).toBe(938);
     expect(c.groups).toBe(40);
+    expect(c.supports).toBe(8); // 8 PINNED joints in the sample (checker #10)
     expect(c.loadPrimary).toBe(14);
     expect(c.loadComb).toBe(274);
     expect(c.loadCases).toBe(288); // = loadPrimary + loadComb (checker #9 disambiguation)
