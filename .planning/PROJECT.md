@@ -31,12 +31,11 @@ Open a STAAD `.std` file and see the 3D analytical model render correctly — on
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] App parses the STAAD input deck entirely in-browser (joints, members, properties, supports, loads) — Validated in Phase 1: Parser & Model
 
 ### Active
 
 - [ ] Engineer can open a `.std` file via file picker or drag-and-drop
-- [ ] App parses the STAAD input deck entirely in-browser (joints, members, properties, supports, loads)
 - [ ] App renders the 3D analytical model procedurally (nodes + members as 3D shapes)
 - [ ] Engineer can color members by section, group, or material
 - [ ] App displays supports and loads as 3D markers/arrows where defined
@@ -69,7 +68,7 @@ Open a STAAD `.std` file and see the 3D analytical model render correctly — on
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Parse `.std` in the browser, not on a server | Zero backend, zero accounts, files never leave the device; privacy is a differentiator | — Pending |
+| Parse `.std` in the browser, not on a server | Zero backend, zero accounts, files never leave the device; privacy is a differentiator | ✅ D-01: client-side only; `@staad-online/parser` (Phase 1) |
 | Render members as procedural shapes, not glTF | Analytical model is just nodes + members; simpler, faster, no pipeline machinery | — Pending |
 | Deliver as a Capacitor hybrid app (iOS/Android) with the same web codebase served in-browser | One codebase covers native stores, mobile, and web; offline by default from the bundled shell | — Pending |
 | Position as a public product | Targets all engineers with STAAD models, not just internal use | — Pending |
@@ -92,4 +91,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-15 after milestone v1.0 started*
+*Last updated: 2026-08-16 after Phase 1 complete (Parser & Model) — `@staad-online/parser` parses real STAAD decks (joints, members, properties, supports, groups, loads) with golden-file verification*
