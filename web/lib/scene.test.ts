@@ -151,10 +151,47 @@ describe("SceneBuilder (REND-02 instancing + D-04/D-06)", () => {
       builder.dispose();
     });
   });
+
+  it("(13) setExaggeration(15) scales shared geometry positions vs scale 1", () => {
+    const builder = new SceneBuilder();
+    const model = makeSurveyModel();
+    return builder.build(model, 1).then((result) => {
+      const before = result.meshes[0].geometry.attributes.position.array as Float32Array;
+      const baseX = before[0];
+      builder.setExaggeration(15);
+      const after = result.meshes[0].geometry.attributes.position.array as Float32Array;
+      expect(after[0]).toBeCloseTo(baseX * 15, 4);
+      builder.dispose();
+    });
+  });
+
+  it("(14) dispose drops mesh refs and leaves maps empty", () => {
+    const builder = new SceneBuilder();
+    const model = makeSurveyModel();
+    return builder.build(model, 15).then((result) => {
+      const uuid = result.meshes[0].geometry.uuid;
+      builder.dispose();
+      expect(result.meshes.length).toBe(0);
+      expect(result.instanceToMember.size).toBe(0);
+      expect(result.memberToInstance.size).toBe(0);
+      expect(THREE.Cache?.enabled ?? true).toBe(true);
+    });
+  });
+
+  it("(15) build result attaches to a bare THREE.Object3D scene without throwing", () => {
+    const builder = new SceneBuilder();
+    const model = makeSurveyModel();
+    const attachment = new THREE.Object3D();
+    return builder.build(model, 15).then((result) => {
+      result.meshes.forEach((m) => attachment.add(m));
+      expect(() => attachment.updateMatrixWorld(true)).not.toThrow();
+      builder.dispose();
+    });
+  });
 });
 
 describe("computeCameraFit (REND-03)", () => {
-  it("(8) a 10×10×10 box returns target ≈ origin and far > near > 0", () => {
+  it("(13) a 10×10×10 box returns target ≈ origin and far > near > 0", () => {
     const bounds: Bounds = { min: [-5, -5, -5], max: [5, 5, 5] };
     const fit = computeCameraFit(bounds);
     expect(fit.target[0]).toBeCloseTo(0, 6);
@@ -164,7 +201,7 @@ describe("computeCameraFit (REND-03)", () => {
     expect(fit.far).toBeGreaterThan(fit.near);
   });
 
-  it("(9) position is ~radius away from target on the expected oblique axis", () => {
+  it("(14) position is ~radius away from target on the expected oblique axis", () => {
     const bounds: Bounds = { min: [-5, -5, -5], max: [5, 5, 5] };
     const fit = computeCameraFit(bounds);
     const dir = new THREE.Vector3(...fit.position).sub(new THREE.Vector3(...fit.target)).normalize();
@@ -173,7 +210,7 @@ describe("computeCameraFit (REND-03)", () => {
     expect(dir.z).toBeGreaterThan(0);
   });
 
-  it("(10) a nearly point model (1e-6 box) still returns finite near/far (no NaN)", () => {
+  it("(15) a nearly point model (1e-6 box) still returns finite near/far (no NaN)", () => {
     const bounds: Bounds = { min: [-1e-6, -1e-6, -1e-6], max: [1e-6, 1e-6, 1e-6] };
     const fit = computeCameraFit(bounds);
     expect(Number.isFinite(fit.near)).toBe(true);
