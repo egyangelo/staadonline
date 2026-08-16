@@ -14,7 +14,7 @@ From empty repo to shipped viewer in four dependency-ordered phases: first a tol
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Parser & Model** - Tolerant headless `.std` parser, typed StaadModel, golden-file corpus (completed 2026-08-16)
-- [ ] **Phase 2: File Opening & 3D Rendering** - Open `.std` and render the 3D analytical model instanced
+- [x] **Phase 2: File Opening & 3D Rendering** - Open `.std` and render the 3D analytical model instanced (completed 2026-08-17)
 - [ ] **Phase 3: Interaction & Visualization** - Color modes, supports/loads markers, member inspection, summary
 - [ ] **Phase 4: Native Packaging & Performance** - Capacitor Android app, offline, worker parse
 
@@ -59,7 +59,7 @@ Plans:
   4. Camera auto-fits the full model bounds on load; thin members render at ~10-20x size exaggeration; large coordinate values are rebased to the model centroid so geometry stays stable.
   5. User can orbit, zoom, and pan the model with touch (mobile) and mouse (desktop).
 
-**Plans**: TBD
+**Plans**: 7 — 02-01 ✅, 02-02 ✅, 02-03 ✅, 02-04 ✅, 02-05 ✅, 02-06 ✅, 02-07 ✅
 **UI hint**: yes
 
 ### Phase 3: Interaction & Visualization
