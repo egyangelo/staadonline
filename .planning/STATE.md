@@ -5,8 +5,8 @@ milestone_name: STAAD Online Viewer
 current_phase: 01
 current_phase_name: parser-model
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-08-15T20:01:24.775Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-08-16T07:30:58.741Z"
 last_activity: 2026-08-15
 last_activity_desc: Phase 01 execution started
 progress:
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 01 (parser-model) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Last activity: 2026-08-15 — Phase 01 execution started
 
@@ -57,6 +57,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-parser-model P1 | 3min | 3 tasks | 7 files |
 | Phase 01-parser-model P2 | 4min | 3 tasks | 2 files |
 | Phase 01-parser-model P3 | 12min | 3 tasks | 10 files |
+| Phase 01-parser-model P4 | 11min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,11 @@ Recent decisions affecting current work:
 - [Phase 01-parser-model]: LOAD disambiguation (checker #9): LOAD <digits> LOADTYPE = primary (14), LOAD COMB <id> = combination (274), loadCases = sum (288); non-numeric LOAD R1 LOADTYPE Mass excluded by digit check
 - [Phase 01-parser-model]: Ambient node-env.d.ts shim (node:fs/node:path/node:url + ImportMeta) instead of installing @types/node — T-03-SC forbids installs, 01-01 owns dependencies
 - [Phase 01-parser-model]: Counting helpers accept abbreviated headers (MEMB INCI / ELEM INCI) per PITFALLS P2
+- [Phase 01-parser-model]: Canonical unit-state defaults are FT/KIP (locked UnitLength/UnitForce unions); STAAD token forms FEET/KIPS map via aliases — never stored
+- [Phase 01-parser-model]: WARNING_CODES stays locked at six codes (types-smoke enforces); the 64MB size-guard reuses IGNORED_COMMAND with severity 'error' at line 0 instead of adding a 7th code
+- [Phase 01-parser-model]: DEFINE-block tolerance (checker #8): single-pass scoped absorption; terminators are END DEFINE, or LOAD<digits>/PERFORM/PAGE/PRINT/DEFINE headers; non-numeric LOAD R1 LOADTYPE Mass is reference-load DATA (absorbed)
+- [Phase 01-parser-model]: Segmentation is a single-pass state machine: unquoted uppercase-first token = new header; digit/_/quote/- first tokens = body; leading body before any header is skipped silently
+- [Phase 01-parser-model]: STAAD header sets ctx.structure (PLANE/SPACE/FRAME); 2-coordinate joint rows valid only under PLANE/FRAME (z=0) — SPACE + 2-coord row = MALFORMED_LINE
 
 ### Pending Todos
 
@@ -103,6 +109,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-15T19:59:31.680Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-08-16T07:30:58.728Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None

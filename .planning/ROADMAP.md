@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Unknown or version-drifted commands are skipped with collected warnings, never fatal; free-format grammar (semicolons, `*` comments, `" -"` continuations, abbreviations, trailing-dot floats) is handled.
   4. The parser produces a typed model (nodes, members, sections, supports, loads, groups, bounds) with zero DOM/Three imports — headless, unit-testable, worker-ready.
 
-**Plans**: 2/9 plans executed
+**Plans**: 3/9 plans executed
 
 Plans:
 
@@ -99,7 +99,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Parser & Model | 2/9 | In Progress|  |
+| 1. Parser & Model | 3/9 | In Progress|  |
 | 2. File Opening & 3D Rendering | TBD | Not started | - |
 | 3. Interaction & Visualization | TBD | Not started | - |
 | 4. Native Packaging & Performance | TBD | Not started | - |
