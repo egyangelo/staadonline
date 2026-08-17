@@ -53,9 +53,9 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 
 ### Summary Panel
 
-- [ ] **SUMR-01**: App shows a model summary panel with node count, member count, group list, and bounding box
-- [ ] **SUMR-02**: Summary always labels units in force for the model
-- [ ] **SUMR-03**: Summary shows the count of parse warnings so users know the model loaded tolerantly
+- [x] **SUMR-01**: App shows a model summary panel with node count, member count, group list, and bounding box
+- [x] **SUMR-02**: Summary always labels units in force for the model
+- [x] **SUMR-03**: Summary shows the count of parse warnings so users know the model loaded tolerantly
 
 ### Native Packaging (Android)
 
@@ -134,9 +134,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INSP-01 | Phase 3 | Complete |
 | INSP-02 | Phase 3 | Complete |
 | INSP-03 | Phase 3 | Complete |
-| SUMR-01 | Phase 3 | Pending |
-| SUMR-02 | Phase 3 | Pending |
-| SUMR-03 | Phase 3 | Pending |
+| SUMR-01 | Phase 3 | Complete |
+| SUMR-02 | Phase 3 | Complete |
+| SUMR-03 | Phase 3 | Complete |
 | PLAT-01 | Phase 4 | Pending |
 | PLAT-02 | Phase 4 | Pending |
 | PLAT-03 | Phase 4 | Pending |

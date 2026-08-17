@@ -83,7 +83,7 @@ Plans:
 - [x] 03-03-PLAN.md — Pick throttle + NO_TAP guard + support/load glyph geometry builders
 - [x] 03-04-PLAN.md — Chrome controls: ColorModeControl, LoadCaseSelector, MagnitudeLabelToggle
 - [x] 03-05-PLAN.md — LegendChip + InspectorPopover (member/support)
-- [ ] 03-06-PLAN.md — ExpandedSummary (StatsSummary Details/Less growth)
+- [x] 03-06-PLAN.md — ExpandedSummary (StatsSummary Details/Less growth)
 - [ ] 03-07-PLAN.md — Scene: ColorLayer (COLOR-04) + PickingController (D-14)
 - [ ] 03-08-PLAN.md — Scene: MarkersLayer (support/load glyphs + labels)
 - [ ] 03-09-PLAN.md — Integration + end-of-phase verification
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Parser & Model | 9/9 | Complete    | 2026-08-16 |
 | 2. File Opening & 3D Rendering | TBD | Not started | - |
-| 3. Interaction & Visualization | 5/9 | In Progress|  |
+| 3. Interaction & Visualization | 6/9 | In Progress|  |
 | 4. Native Packaging & Performance | TBD | Not started | - |
