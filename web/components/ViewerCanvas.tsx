@@ -19,12 +19,15 @@
  */
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { computeCameraFit, SceneBuilder } from "@/lib/scene";
+import { computeCameraFit, rebaseModel, SceneBuilder, type SceneBuildResult } from "@/lib/scene";
 import { useModelStore } from "@/store/modelStore";
 import { useViewerStore } from "@/store/viewerStore";
+import { ColorLayer, type ColorLayerHandle } from "./ColorLayer";
+import { PickingController } from "./PickingController";
+import { MarkersLayer } from "./MarkersLayer";
 
 /** Debounced resize fit: at most one rAF per resize burst (T-02-05). */
 function useResizeFit(fit: () => void) {
@@ -60,6 +63,24 @@ function SceneContents() {
   const bounds = useRef<{ min: [number, number, number]; max: [number, number, number] } | null>(null);
   const exaggerationRef = useRef(exaggeration);
   exaggerationRef.current = exaggeration;
+
+  // 03-09: scene result + interaction layers (ColorLayer/PickingController/
+  // MarkersLayer) are driven by the resolved SceneBuildResult.
+  const [sceneResult, setSceneResult] = useState<SceneBuildResult | null>(null);
+  const [supportObjects, setSupportObjects] = useState<THREE.Object3D[]>([]);
+  const colorLayerRef = useRef<ColorLayerHandle | null>(null);
+
+  const handleSupportObjects = useCallback((objs: THREE.Object3D[] | null) => {
+    setSupportObjects(objs ?? []);
+  }, []);
+
+  // Rebased node coords (rebaseModel nodeCoords) for marker placement.
+  const coords = useMemo(() => (model ? rebaseModel(model).nodeCoords : null), [model]);
+
+  const dark = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }, []);
 
   const fitCamera = useCallback(
     (b: { min: [number, number, number]; max: [number, number, number] }) => {
@@ -103,6 +124,8 @@ function SceneContents() {
       }
     }
     bounds.current = null;
+    setSceneResult(null);
+    setSupportObjects([]);
 
     if (status !== "ready" || !model) return;
 
@@ -116,6 +139,7 @@ function SceneContents() {
         result.meshes.forEach((mesh) => groupRef.current!.add(mesh));
       }
       bounds.current = result.rebasedBounds;
+      setSceneResult(result);
       fitCamera(result.rebasedBounds);
     });
 
@@ -124,6 +148,8 @@ function SceneContents() {
       builder.dispose();
       sceneRef.current = null;
       bounds.current = null;
+      setSceneResult(null);
+      setSupportObjects([]);
     };
   }, [model, status, fitCamera]);
 
@@ -138,6 +164,23 @@ function SceneContents() {
       <hemisphereLight intensity={0.55} />
       <directionalLight position={[8, 12, 6]} intensity={1.1} />
       <group ref={groupRef} />
+      {sceneResult ? (
+        <>
+          <ColorLayer
+            ref={colorLayerRef}
+            meshes={sceneResult.meshes}
+            instanceToMember={sceneResult.instanceToMember}
+            theme={dark ? "dark" : "light"}
+          />
+          <PickingController
+            meshes={sceneResult.meshes}
+            instanceToMember={sceneResult.instanceToMember}
+            supportObjects={supportObjects}
+            colorLayerRef={colorLayerRef}
+          />
+          <MarkersLayer coords={coords} onSupportObjects={handleSupportObjects} />
+        </>
+      ) : null}
       <OrbitControls
         ref={controlsRef}
         makeDefault
