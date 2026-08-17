@@ -1,0 +1,51 @@
+/* MarkersLayer — magnitude label chips (03-08 Task 3, D-10). */
+
+.labelChip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font: 600 12px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.01em;
+  color: #1d1d1f;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .labelChip {
+    background: rgba(28, 28, 30, 0.88);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #f5f5f7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .labelChip {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .labelChip {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: dark) {
+  .labelChip {
+    background: #1c1c1e;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .labelChip {
+    border-color: #9a9aa0;
+  }
+}
