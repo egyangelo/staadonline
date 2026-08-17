@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Parser & Model** - Tolerant headless `.std` parser, typed StaadModel, golden-file corpus (completed 2026-08-16)
 - [x] **Phase 2: File Opening & 3D Rendering** - Open `.std` and render the 3D analytical model instanced (completed 2026-08-17)
-- [ ] **Phase 3: Interaction & Visualization** - Color modes, supports/loads markers, member inspection, summary
+- [x] **Phase 3: Interaction & Visualization** - Color modes, supports/loads markers, member inspection, summary (completed 2026-08-17)
 - [ ] **Phase 4: Native Packaging & Performance** - Capacitor Android app, offline, worker parse
 
 ## Phase Details
@@ -86,7 +86,7 @@ Plans:
 - [x] 03-06-PLAN.md — ExpandedSummary (StatsSummary Details/Less growth)
 - [x] 03-07-PLAN.md — Scene: ColorLayer (COLOR-04) + PickingController (D-14)
 - [x] 03-08-PLAN.md — Scene: MarkersLayer (support/load glyphs + labels)
-- [ ] 03-09-PLAN.md — Integration + end-of-phase verification
+- [x] 03-09-PLAN.md — Integration + end-of-phase verification
 
 **UI hint**: yes
 
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Parser & Model | 9/9 | Complete    | 2026-08-16 |
 | 2. File Opening & 3D Rendering | TBD | Not started | - |
-| 3. Interaction & Visualization | 8/9 | In Progress|  |
+| 3. Interaction & Visualization | 9/9 | Complete   | 2026-08-17 |
 | 4. Native Packaging & Performance | TBD | Not started | - |
