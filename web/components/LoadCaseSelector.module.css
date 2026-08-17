@@ -1,10 +1,9 @@
-/* LoadCaseSelector — UI-SPEC tokens (03-04 Task 2, D-12). */
+/* LoadCaseSelector — UI-SPEC tokens (03-04 Task 2, D-12).
+   03-09: self-fixed positioning relaxed so the toolbar (viewer.module.css
+   .loadToolbar) owns the top-right slot and this renders inline. */
 
 .container {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 21;
+  position: relative;
 }
 
 .trigger {

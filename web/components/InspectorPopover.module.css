@@ -1,9 +1,11 @@
-/* InspectorPopover — UI-SPEC tokens (03-05 Task 2, D-13/D-08/D-15). */
+/* InspectorPopover — UI-SPEC tokens (03-05 Task 2, D-13/D-08/D-15).
+   03-09: right-edge slot moved below the top-right loads toolbar so the
+   four float zones never stack (T-03-04). */
 
 .popover {
   box-sizing: border-box;
   position: fixed;
-  top: 16px;
+  top: 88px;
   right: 16px;
   z-index: 22;
   width: min(320px, calc(100vw - 32px));
