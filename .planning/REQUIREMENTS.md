@@ -36,7 +36,7 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 - [x] **COLOR-01**: User can color members by section
 - [x] **COLOR-02**: User can color members by group
 - [ ] **COLOR-03**: User can color members by material
-- [ ] **COLOR-04**: User can switch color modes without rebuilding the scene (per-instance color buffer rewrite)
+- [x] **COLOR-04**: User can switch color modes without rebuilding the scene (per-instance color buffer rewrite)
 
 ### Supports and Loads
 
@@ -126,7 +126,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COLOR-01 | Phase 3 | Complete |
 | COLOR-02 | Phase 3 | Complete |
 | COLOR-03 | Phase 3 | Pending |
-| COLOR-04 | Phase 3 | Pending |
+| COLOR-04 | Phase 3 | Complete |
 | MARK-01 | Phase 3 | Pending |
 | MARK-02 | Phase 3 | Complete |
 | MARK-03 | Phase 3 | Complete |
