@@ -43,13 +43,13 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 - [ ] **MARK-01**: App displays supports as 3D markers at supported nodes, distinguishing restraint types
 - [x] **MARK-02**: App displays loads as 3D arrows with direction and magnitude labels
 - [x] **MARK-03**: User can select which load case to display via a load-case selector
-- [ ] **MARK-04**: Load arrow direction conventions are labeled (global vs local axis) so magnitudes are interpretable
+- [x] **MARK-04**: Load arrow direction conventions are labeled (global vs local axis) so magnitudes are interpretable
 
 ### Member Inspection
 
-- [ ] **INSP-01**: User can tap/click a member to view its section, group, length, and node coordinates
-- [ ] **INSP-02**: Hovering a member highlights it, with a usable tap target on dense models
-- [ ] **INSP-03**: Members referencing a section with no bundled dimension data show an "approximate dimensions" flag
+- [x] **INSP-01**: User can tap/click a member to view its section, group, length, and node coordinates
+- [x] **INSP-02**: Hovering a member highlights it, with a usable tap target on dense models
+- [x] **INSP-03**: Members referencing a section with no bundled dimension data show an "approximate dimensions" flag
 
 ### Summary Panel
 
@@ -130,10 +130,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MARK-01 | Phase 3 | Pending |
 | MARK-02 | Phase 3 | Complete |
 | MARK-03 | Phase 3 | Complete |
-| MARK-04 | Phase 3 | Pending |
-| INSP-01 | Phase 3 | Pending |
-| INSP-02 | Phase 3 | Pending |
-| INSP-03 | Phase 3 | Pending |
+| MARK-04 | Phase 3 | Complete |
+| INSP-01 | Phase 3 | Complete |
+| INSP-02 | Phase 3 | Complete |
+| INSP-03 | Phase 3 | Complete |
 | SUMR-01 | Phase 3 | Pending |
 | SUMR-02 | Phase 3 | Pending |
 | SUMR-03 | Phase 3 | Pending |
