@@ -85,7 +85,7 @@ Plans:
 - [x] 03-05-PLAN.md — LegendChip + InspectorPopover (member/support)
 - [x] 03-06-PLAN.md — ExpandedSummary (StatsSummary Details/Less growth)
 - [x] 03-07-PLAN.md — Scene: ColorLayer (COLOR-04) + PickingController (D-14)
-- [ ] 03-08-PLAN.md — Scene: MarkersLayer (support/load glyphs + labels)
+- [x] 03-08-PLAN.md — Scene: MarkersLayer (support/load glyphs + labels)
 - [ ] 03-09-PLAN.md — Integration + end-of-phase verification
 
 **UI hint**: yes
@@ -114,5 +114,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Parser & Model | 9/9 | Complete    | 2026-08-16 |
 | 2. File Opening & 3D Rendering | TBD | Not started | - |
-| 3. Interaction & Visualization | 7/9 | In Progress|  |
+| 3. Interaction & Visualization | 8/9 | In Progress|  |
 | 4. Native Packaging & Performance | TBD | Not started | - |

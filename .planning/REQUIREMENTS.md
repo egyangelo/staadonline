@@ -40,7 +40,7 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 
 ### Supports and Loads
 
-- [ ] **MARK-01**: App displays supports as 3D markers at supported nodes, distinguishing restraint types
+- [x] **MARK-01**: App displays supports as 3D markers at supported nodes, distinguishing restraint types
 - [x] **MARK-02**: App displays loads as 3D arrows with direction and magnitude labels
 - [x] **MARK-03**: User can select which load case to display via a load-case selector
 - [x] **MARK-04**: Load arrow direction conventions are labeled (global vs local axis) so magnitudes are interpretable
@@ -127,7 +127,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COLOR-02 | Phase 3 | Complete |
 | COLOR-03 | Phase 3 | Pending |
 | COLOR-04 | Phase 3 | Complete |
-| MARK-01 | Phase 3 | Pending |
+| MARK-01 | Phase 3 | Complete |
 | MARK-02 | Phase 3 | Complete |
 | MARK-03 | Phase 3 | Complete |
 | MARK-04 | Phase 3 | Complete |
