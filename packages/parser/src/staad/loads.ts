@@ -295,6 +295,7 @@ export function memberLoadHandler(ctx: ParseContext, block: CommandBlock): void 
       magnitude: mag,
       targets: expandList(listTokens, maxRef > 0 ? { maxRef } : {}),
       line: entry.line,
+      loadType: type,
     });
   }
 }
@@ -336,6 +337,7 @@ export function jointLoadHandler(ctx: ParseContext, block: CommandBlock): void {
       magnitude: mag,
       targets: expandList(listTokens, maxRef > 0 ? { maxRef } : {}),
       line: entry.line,
+      loadType: tokens[i]?.toUpperCase(),
     });
   }
 }

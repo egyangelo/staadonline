@@ -113,6 +113,13 @@ export interface LoadItem {
   targets: number[];
   /** Source line number (warning attribution). */
   line: number;
+  /**
+   * Verbatim load-type token from the source row (D-05 informational):
+   * MEMBER LOAD CON/UNI/MOM/TRAP…, JOINT LOAD force/moment token (FY/MX…),
+   * SELFWEIGHT absent. Preserved so the renderer can distinguish distributed
+   * and moment glyphs without re-parsing display text.
+   */
+  loadType?: string;
 }
 
 /** Load-case class: a directly-specified primary case vs. a combination. */
