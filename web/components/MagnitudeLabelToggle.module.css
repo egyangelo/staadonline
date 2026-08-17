@@ -1,0 +1,95 @@
+/* MagnitudeLabelToggle — UI-SPEC tokens (03-04 Task 3, D-10). */
+
+.pill {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  font: 600 12px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1c1c1e;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.pill:hover {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.pill[aria-pressed="true"] {
+  background: #ffffff;
+  color: #1c1c1e;
+}
+
+.pill[aria-pressed="false"] {
+  color: #6e6e73;
+}
+
+.pill:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .pill {
+    min-height: 44px;
+  }
+}
+
+@media (pointer: fine) {
+  .pill {
+    min-height: 36px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .pill {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(28, 28, 30, 0.72);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
+  }
+
+  .pill:hover {
+    background: rgba(28, 28, 30, 0.88);
+  }
+
+  .pill[aria-pressed="true"] {
+    background: #1c1c1e;
+    color: #ffffff;
+  }
+
+  .pill[aria-pressed="false"] {
+    color: #a1a1a6;
+  }
+
+  .pill:focus-visible {
+    outline-color: #0a84ff;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .pill {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (prefers-reduced-transparency: reduce) {
+  .pill {
+    background: rgba(28, 28, 30, 0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    transition: none;
+  }
+}
