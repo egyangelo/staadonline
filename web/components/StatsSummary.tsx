@@ -10,8 +10,9 @@
  * no HTML injection anywhere; approximate count is derived from
  * `approximate === true` booleans only (no string parsing, T-02-05).
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useModelStore } from "@/store/modelStore";
+import { buildSummaryData } from "@/lib/summaryData";
 import styles from "./StatsSummary.module.css";
 
 function formatAxis(label: string, [min, max]: [number, number]): string {
@@ -20,10 +21,16 @@ function formatAxis(label: string, [min, max]: [number, number]): string {
 
 export function StatsSummary() {
   const [collapsed, setCollapsed] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const model = useModelStore((s) => s.model);
   const warnings = useModelStore((s) => s.warnings);
 
-  if (!model) return null;
+  const summary = useMemo(
+    () => (model ? buildSummaryData(model, warnings) : null),
+    [model, warnings],
+  );
+
+  if (!model || !summary) return null;
 
   const sections = [...model.sections.values()];
   const approximateCount = sections.filter((s) => s.approximate === true).length;
@@ -47,31 +54,44 @@ export function StatsSummary() {
   ].join("  ");
 
   return (
-    <aside className={styles.card} aria-label="Model summary">
+    <aside
+      className={`${styles.card} ${expanded && !collapsed ? styles.cardExpanded : ""}`}
+      aria-label="Model summary"
+    >
       <div className={styles.header}>
         <span className={styles.title}>Model summary</span>
-        <button
-          type="button"
-          className={styles.toggle}
-          aria-label={collapsed ? "Expand model summary" : "Collapse model summary"}
-          aria-expanded={!collapsed}
-          onClick={() => setCollapsed((c) => !c)}
-        >
-          <svg
-            className={`${styles.chevron} ${collapsed ? styles.chevronClosed : ""}`}
-            viewBox="0 0 20 20"
-            fill="none"
-            aria-hidden="true"
+        <div className={styles.headerControls}>
+          <button
+            type="button"
+            className={styles.detailsPill}
+            aria-expanded={expanded}
+            onClick={() => setExpanded((e) => !e)}
           >
-            <path
-              d="M5 12.5 10 7.5 15 12.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            {expanded ? "Less" : "Details"}
+          </button>
+          <button
+            type="button"
+            className={styles.toggle}
+            aria-label={collapsed ? "Expand model summary" : "Collapse model summary"}
+            aria-expanded={!collapsed}
+            onClick={() => setCollapsed((c) => !c)}
+          >
+            <svg
+              className={`${styles.chevron} ${collapsed ? styles.chevronClosed : ""}`}
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M5 12.5 10 7.5 15 12.5"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {!collapsed && (
@@ -113,6 +133,60 @@ export function StatsSummary() {
               </span>
             )}
           </div>
+
+          {expanded && (
+            <div className={styles.extra}>
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>GROUPS</h3>
+                {summary.groupList.length === 0 ? (
+                  <p className={styles.emptyText}>No groups defined</p>
+                ) : (
+                  <ul className={styles.groupList}>
+                    {summary.groupList.map((g) => (
+                      <li key={g.name} className={styles.groupRow}>
+                        <span className={styles.groupName}>{g.name}</span>
+                        <span className={styles.groupCount}>
+                          · {g.count} {g.count === 1 ? "member" : "members"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>BOUNDING BOX</h3>
+                <dl className={styles.bboxList}>
+                  {summary.boundingBoxRows.map((row) => (
+                    <div key={row.axis} className={styles.bboxRow}>
+                      <dt>{row.axis}</dt>
+                      <dd>
+                        {row.min.toFixed(2)} .. {row.max.toFixed(2)}
+                      </dd>
+                      <dd className={styles.extent}>Extent {row.extent.toFixed(2)}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+
+              <section className={styles.section}>
+                <h3 className={styles.sectionTitle}>WARNINGS</h3>
+                <ul className={styles.warningList}>
+                  {summary.warningsList.map((w) => (
+                    <li key={`${w.code}-${w.line}`} className={styles.warningRow}>
+                      <span className={styles.warningCode}>{w.code}</span>
+                      <span className={styles.warningLine}>· {w.line}</span>
+                    </li>
+                  ))}
+                </ul>
+                {summary.warningsTruncated && (
+                  <p className={styles.warningFooter}>
+                    Showing first 12 of {summary.warningsTotal}
+                  </p>
+                )}
+              </section>
+            </div>
+          )}
         </div>
       )}
     </aside>
