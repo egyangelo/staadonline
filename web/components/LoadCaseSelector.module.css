@@ -1,0 +1,229 @@
+/* LoadCaseSelector — UI-SPEC tokens (03-04 Task 2, D-12). */
+
+.container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 21;
+}
+
+.trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 44px;
+  padding: 4px 14px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.trigger:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.trigger:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+}
+
+.caption {
+  font: 400 12px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6e6e73;
+}
+
+.value {
+  font: 400 14px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.01em;
+  color: #1c1c1e;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  width: 320px;
+  max-height: 320px;
+  overflow-y: auto;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  max-height: 0;
+  animation: open 250ms cubic-bezier(0.32, 0.72, 0.25, 1) forwards;
+}
+
+@keyframes open {
+  from {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    max-height: 320px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.row:hover {
+  background: rgba(0, 122, 255, 0.08);
+}
+
+.row:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: -2px;
+}
+
+.rowId {
+  font: 400 14px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace;
+  letter-spacing: 0.01em;
+  color: #6e6e73;
+  min-width: 2.5em;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rowTitle {
+  font: 400 16px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, sans-serif;
+  color: #1c1c1e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+li[aria-selected="true"] .rowTitle {
+  color: #007aff;
+}
+
+.check {
+  color: #007aff;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+@media (pointer: coarse) {
+  .trigger {
+    min-height: 44px;
+  }
+}
+
+@media (pointer: fine) {
+  .trigger {
+    min-height: 36px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .trigger {
+    background: rgba(28, 28, 30, 0.72);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .trigger:focus-visible {
+    outline-color: #0a84ff;
+  }
+
+  .caption {
+    color: #a1a1a6;
+  }
+
+  .value {
+    color: #ffffff;
+  }
+
+  .dropdown {
+    background: rgba(28, 28, 30, 0.78);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .row:hover {
+    background: rgba(10, 132, 255, 0.12);
+  }
+
+  .row:focus-visible {
+    outline-color: #0a84ff;
+  }
+
+  .rowId {
+    color: #a1a1a6;
+  }
+
+  .rowTitle {
+    color: #ffffff;
+  }
+
+  li[aria-selected="true"] .rowTitle {
+    color: #0a84ff;
+  }
+
+  .check {
+    color: #0a84ff;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .trigger {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .dropdown {
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) and (prefers-reduced-transparency: reduce) {
+  .trigger {
+    background: rgba(28, 28, 30, 0.96);
+  }
+
+  .dropdown {
+    background: rgba(28, 28, 30, 0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown {
+    max-height: none !important;
+    transition: opacity 150ms ease;
+    animation: none;
+  }
+}
