@@ -74,7 +74,20 @@ Plans:
   3. User can tap/click any member to view its section, group, length, and node coordinates; hovering highlights it with a usable tap target on dense models, and name-only sections show an "approximate dimensions" flag.
   4. The summary panel shows node count, member count, group list, bounding box, force units, and parse-warning count so users know the model loaded correctly and tolerantly.
 
-**Plans**: TBD
+**Plans**: 9/9 plans created (pending execution)
+
+Plans:
+
+- [ ] 03-01-PLAN.md — Viewer store prefs + categorical palettes + color-buffer rewrite lib
+- [ ] 03-02-PLAN.md — Load-case union resolution + axis refs + magnitude formatting + summary dataset
+- [ ] 03-03-PLAN.md — Pick throttle + NO_TAP guard + support/load glyph geometry builders
+- [ ] 03-04-PLAN.md — Chrome controls: ColorModeControl, LoadCaseSelector, MagnitudeLabelToggle
+- [ ] 03-05-PLAN.md — LegendChip + InspectorPopover (member/support)
+- [ ] 03-06-PLAN.md — ExpandedSummary (StatsSummary Details/Less growth)
+- [ ] 03-07-PLAN.md — Scene: ColorLayer (COLOR-04) + PickingController (D-14)
+- [ ] 03-08-PLAN.md — Scene: MarkersLayer (support/load glyphs + labels)
+- [ ] 03-09-PLAN.md — Integration + end-of-phase verification
+
 **UI hint**: yes
 
 ### Phase 4: Native Packaging & Performance
