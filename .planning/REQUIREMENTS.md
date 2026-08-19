@@ -66,7 +66,7 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 ### Performance
 
 - [ ] **PERF-01**: Files above ~2 MB parse in a Web Worker off the main thread
-- [ ] **PERF-02**: Parse shows progress feedback for large files
+- [x] **PERF-02**: Parse shows progress feedback for large files
 
 ## v2 Requirements
 
@@ -141,7 +141,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-02 | Phase 4 | Pending |
 | PLAT-03 | Phase 4 | Pending |
 | PERF-01 | Phase 4 | Pending |
-| PERF-02 | Phase 4 | Pending |
+| PERF-02 | Phase 4 | Complete |
 
 **Coverage:**
 
