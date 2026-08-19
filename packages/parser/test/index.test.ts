@@ -204,4 +204,24 @@ JOINT COORDINATES
     expect(seen.every((f, i) => i === 0 || f >= seen[i - 1])).toBe(true);
     expect(seen.some((f) => f > 0 && f < 1)).toBe(true);
   });
+
+  it('(A) is non-breaking: parseStaad(text) without a callback returns a valid result', () => {
+    const r = parseStaad('STAAD SPACE\nJOINT COORDINATES\n1 0 0 0\n');
+    expect(r.model.nodes).toHaveLength(1);
+  });
+
+  it('(C) oversized input never invokes onProgress (T-04-01)', () => {
+    const oversized = 'x'.repeat(MAX_INPUT_LENGTH + 1);
+    let called = false;
+    parseStaad(oversized, () => {
+      called = true;
+    });
+    expect(called).toBe(false);
+  });
+
+  it('(D) empty input fires exactly [1] with no intermediate fractions', () => {
+    const seen2: number[] = [];
+    parseStaad('', (f) => seen2.push(f));
+    expect(seen2).toEqual([1]);
+  });
 });
