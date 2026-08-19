@@ -65,7 +65,7 @@ Each task was committed atomically (single RED→GREEN TDD cycle spanning both p
 1. **Task 1: Add readNativeFile native branch (D-01/D-02, PLAT-03)** - `fd2b838` (feat)
 2. **Task 2: Unit tests — streaming path, guard ordering, cancel no-op** - `ddf462d` (test)
 
-**Plan metadata:** `9fc9d20` (docs: complete plan)
+**Plan metadata:** `54b25c1` (docs: complete plan)
 
 _Note: The two `tdd="true"` tasks form one cohesive feature, so the tests (RED, `ddf462d`) were committed before the implementation (GREEN, `fd2b838`); the RED gate genuinely failed (`readNativeFile is not a function`) before GREEN passed._
 
