@@ -8,11 +8,11 @@
  * the structured-cloned ParseResult back (D-05). Parse throws degrade to
  * `{ type: 'error', message }` — the parser is tolerant, so this is defensive.
  *
- * This file is a module-worker target only (created with
- * `new Worker(new URL('./staad.worker.ts', import.meta.url), { type: 'module' })`
- * by parseModel — the static path is enforced by the caller, never here). It is
- * never imported by the page directly. It must not import `next/server` or any
- * Node API; `transpilePackages` makes the TS parser import work.
+ * This file is a module-worker target only, instantiated by parseModel with the
+ * exact static path `./staad.worker.ts` and `{ type: 'module' }` (the caller
+ * owns the literal `new URL(...)`, T-04-15). It is never imported by the page
+ * directly. It must not import `next/server` or any Node API;
+ * `transpilePackages` makes the TS parser import work.
  */
 
 import { parseStaad } from "@staad-online/parser";
