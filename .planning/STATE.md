@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: STAAD Online Viewer
 status: executing
-last_updated: "2026-08-19T13:06:46.423Z"
+last_updated: "2026-08-19T13:30:45.471Z"
 last_activity: 2026-08-19
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 31
-  completed_plans: 28
+  completed_plans: 30
   percent: 75
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 04 (native-packaging-performance) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-08-19
 
-Progress: [█████████░] 90%
+Progress: [██████████] 97%
 
 ### Phase 2 execution waves (for the executor)
 
@@ -74,6 +74,7 @@ Progress: [█████████░] 90%
 | Phase 04-native-packaging-performance P01 | 4min | 3 tasks | 3 files |
 | Phase 04-native-packaging-performance P05 | 36 min | 6 tasks | 87 files |
 | Phase 04-native-packaging-performance P02 | 5min | 2 tasks | 2 files |
+| Phase 04-native-packaging-performance P04 | 2min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,7 @@ Recent decisions affecting current work:
 - [Phase ?]: @capawesome/capacitor-file-picker pinned to ^8.0.4 (latest current stable matching Capacitor 8), not the plan-example 6.x
 - [Phase ?]: Signing secrets live only in git-ignored web/android/keystore.properties / env vars; keystore never committed (T-04-21)
 - [Phase 04-native-packaging-performance]: readNativeFile takes the picker structural { name, path?, blob? } shape and returns the same OpenedFile { name, text } as readStdFile so page.tsx stays branch-agnostic (D-01/D-02); size probed (blob.size / content-length) BEFORE assertValidStdFile so TOO_LARGE fires pre-read, 0 probe falls through to read path (R-5); fetch only ever on Capacitor.convertFileSrc(path), never raw content:// URI (R-3); picker cancel returns undefined as strict no-op (FILE-03) — Native branch reuses FileService guards + FileServiceError codes unchanged (WRONG_TYPE/TOO_LARGE/UNREADABLE); streaming blob path satisfies PLAT-03 no-base64; unit-proven in node with Capacitor surface mocked for 04-06 device wiring
+- [Phase 04-native-packaging-performance]: modelStore.progress + setProgress is the single source of truth for worker-relay progress (D-07); progress: number | null null-reset on beginLoading/setModel/setError per FILE-03; LoadingOverlay takes optional fraction?: number | null (non-breaking, keeps page.tsx no-arg call valid) and renders role=progressbar with hard-coded aria-valuemin=0/aria-valuemax=100 and clamped aria-valuenow; % rendered as React text node (T-04-20)
 
 ### Pending Todos
 
@@ -152,6 +154,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-19T13:06:46.410Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-08-19T13:30:45.458Z
+Stopped at: Completed 04-04-PLAN.md
 Resume file: None
