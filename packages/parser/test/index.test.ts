@@ -188,3 +188,20 @@ describe('ParseProgress contract export (04-01, D-06)', () => {
     expect(staged.fraction).toBe(1);
   });
 });
+
+describe('parseStaad — optional progress callback (04-01, D-06)', () => {
+  it('(B) a multi-block deck fires a non-decreasing fraction ending at exactly 1.0', () => {
+    const deck = `STAAD SPACE
+UNIT METER KN
+JOINT COORDINATES
+1 0 0 0
+2 6 0 0
+`;
+    const seen: number[] = [];
+    parseStaad(deck, (f) => seen.push(f));
+    expect(seen[seen.length - 1]).toBe(1);
+    expect(seen.length).toBeGreaterThanOrEqual(2);
+    expect(seen.every((f, i) => i === 0 || f >= seen[i - 1])).toBe(true);
+    expect(seen.some((f) => f > 0 && f < 1)).toBe(true);
+  });
+});
