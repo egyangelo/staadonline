@@ -27,6 +27,7 @@ import { useModelStore } from "@/store/modelStore";
 import { useViewerStore } from "@/store/viewerStore";
 import { ViewerCanvas } from "@/components/ViewerCanvas";
 import { OpenControl } from "@/components/OpenControl";
+import { NativeOpenControl } from "@/components/NativeOpenControl";
 import { ExaggerationSlider } from "@/components/ExaggerationSlider";
 import { StatsSummary } from "@/components/StatsSummary";
 import { ErrorToast, type ErrorCode } from "@/components/ErrorToast";
@@ -95,6 +96,47 @@ export default function Home() {
     }
   }, []);
 
+  const openNativeFile = useCallback(
+    async (opened: { name: string; text: string }) => {
+      // Same abort discipline as openFile: every open aborts the previous
+      // in-flight one; a stale token never commits setModel.
+      const token = ++openToken.current;
+      setError(null);
+      setErrorDetail(undefined);
+      useModelStore.getState().beginLoading();
+
+      try {
+        // text is already materialized by readNativeFile in NativeOpenControl;
+        // this routes through the SAME parseModel pipeline as openFile.
+        const result = await parseModel(opened.text, (f) =>
+          useModelStore.getState().setProgress(f),
+        );
+        if (token !== openToken.current) return;
+        useModelStore.getState().setModel(result, opened.name);
+        // ERROR/EMPTY restore + markers default-on (03-09, T-03-01).
+        useViewerStore
+          .getState()
+          .resetSceneState(
+            result.model.loadCases[0]?.id,
+            result.model.supports.length > 0 ||
+              result.model.loadCases.length > 0,
+          );
+      } catch (e) {
+        if (token !== openToken.current) return;
+        if (e instanceof FileServiceError) {
+          setError(ERROR_CODE_MAP[e.code]);
+        } else {
+          setError("PARSE");
+          setErrorDetail(e instanceof Error ? e.message : String(e));
+        }
+        // EMPTY restored without touching model/warnings (FILE-03).
+        useModelStore.getState().setError();
+        useViewerStore.getState().resetSceneState(undefined, false);
+      }
+    },
+    [],
+  );
+
   useEffect(() => {
     const onDragOver = (e: DragEvent) => {
       e.preventDefault();
@@ -117,7 +159,7 @@ export default function Home() {
       window.removeEventListener("dragleave", onDragLeave);
       window.removeEventListener("drop", onDrop);
     };
-  }, [openFile]);
+  }, [openFile, openNativeFile]);
 
   const ready = status === "ready";
   const loading = status === "loading";
@@ -166,6 +208,7 @@ export default function Home() {
 
       <div className={styles.cluster}>
         <OpenControl onOpen={openFile} />
+        <NativeOpenControl onOpen={(opened) => void openNativeFile(opened)} />
         <ExaggerationSlider />
       </div>
 
