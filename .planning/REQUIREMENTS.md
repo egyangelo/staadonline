@@ -59,8 +59,8 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 
 ### Native Packaging (Android)
 
-- [ ] **PLAT-01**: App is packaged as a native Android app via Capacitor
-- [ ] **PLAT-02**: App works offline on Android after installation
+- [x] **PLAT-01**: App is packaged as a native Android app via Capacitor
+- [x] **PLAT-02**: App works offline on Android after installation
 - [ ] **PLAT-03**: Native file opening uses the Capacitor file-picker plugin without base64 reads (streaming path)
 
 ### Performance
@@ -137,8 +137,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUMR-01 | Phase 3 | Complete |
 | SUMR-02 | Phase 3 | Complete |
 | SUMR-03 | Phase 3 | Complete |
-| PLAT-01 | Phase 4 | Pending |
-| PLAT-02 | Phase 4 | Pending |
+| PLAT-01 | Phase 4 | Complete |
+| PLAT-02 | Phase 4 | Complete |
 | PLAT-03 | Phase 4 | Pending |
 | PERF-01 | Phase 4 | Pending |
 | PERF-02 | Phase 4 | Complete |

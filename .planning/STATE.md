@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: STAAD Online Viewer
 status: executing
-last_updated: "2026-08-19T11:51:04.982Z"
+last_updated: "2026-08-19T12:53:26.069Z"
 last_activity: 2026-08-19
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 31
-  completed_plans: 26
+  completed_plans: 27
   percent: 75
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-08-15)
 ## Current Position
 
 Phase: 04 (native-packaging-performance) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-08-19
 
-Progress: [████████░░] 84%
+Progress: [█████████░] 87%
 
 ### Phase 2 execution waves (for the executor)
 
@@ -72,6 +72,7 @@ Progress: [████████░░] 84%
 | Phase 01-parser-model P07 | 16min | 3 tasks | 6 files |
 | Phase 01-parser-model P09 | 9min | 3 tasks | 8 files |
 | Phase 04-native-packaging-performance P01 | 4min | 3 tasks | 3 files |
+| Phase 04-native-packaging-performance P05 | 36 min | 6 tasks | 87 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,10 @@ Recent decisions affecting current work:
 - [Phase ?]: feet-imperial: model units carry the FINAL stateful state (IN/KIP after UNIT INCH); manifest unit (FEET/KIPS) is the first UNIT line - both asserted per their contracts
 - [Phase ?]: Member rows parse greedily as multi (list i j) groups when complete, else maximal-list fallback - continuation merge '3 3 1 4 1 2' = member 3: 3->1 AND member 4: 1->2
 - [Phase 04-native-packaging-performance]: parseStaad gains a non-breaking optional onProgress callback firing a per-block non-decreasing fraction [0,1] (0.1 after tokenize, 0.15->0.95 per block, 1.0 at finalize); empty input fires exactly [1]; the 64 MB size-guard returns before any callback (D-06, T-04-01)
+- [Phase ?]: Capacitor 8 stack pinned to ^8.5.0; Capacitor 9 explicitly NOT targeted (R-2/T-04-26)
+- [Phase ?]: @capawesome/capacitor-file-picker pinned to ^8.0.4 (latest current stable matching Capacitor 8), not the plan-example 6.x
+- [Phase ?]: Signing secrets live only in git-ignored web/android/keystore.properties / env vars; keystore never committed (T-04-21)
+
 ### Pending Todos
 
 None yet.
@@ -145,6 +150,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-19T11:47:57.276Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-08-19T12:53:26.053Z
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None
