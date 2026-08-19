@@ -6,9 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:android": "next build && cap sync android && cd android && ./gradlew assembleRelease",
+    "bundle:android": "next build && cap sync android && cd android && ./gradlew bundleRelease"
   },
   "dependencies": {
+    "@capacitor/core": "^8.5.0",
+    "@capawesome/capacitor-file-picker": "^8.0.4",
     "@react-three/drei": "10.7.8",
     "@react-three/fiber": "9.7.0",
     "@staad-online/parser": "*",
@@ -19,6 +23,9 @@
     "zustand": "5.0.15"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
