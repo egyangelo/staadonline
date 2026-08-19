@@ -72,8 +72,18 @@ function emptyModel(): StaadModel {
  * Parse raw `.std` text into a typed StaadModel plus collected warnings.
  * Never throws on malformed or unknown input — problems degrade to
  * structured warnings (D-06/D-07).
+ *
+ * The optional `onProgress` callback (D-06) fires a non-decreasing fraction
+ * in [0,1] at per-block cadence: 0.1 after tokenize+segment, 0.15→0.95
+ * through the block loop, 1.0 at finalize. It is pure and worker-safe — it
+ * receives only a numeric fraction and never captures DOM/postMessage/React;
+ * the Phase 4 worker wraps it. The 64 MB size guard returns before any
+ * callback, so an oversized input reports no progress (T-04-01).
  */
-export function parseStaad(text: string): ParseResult {
+export function parseStaad(
+  text: string,
+  onProgress?: (fraction: number) => void,
+): ParseResult {
   if (text.length > MAX_INPUT_LENGTH) {
     const warning: ParseWarning = {
       code: WARNING_CODES.IGNORED_COMMAND,
@@ -88,7 +98,15 @@ export function parseStaad(text: string): ParseResult {
   const ctx = createContext();
   const blocks = segmentBlocks(entries);
 
-  for (const block of blocks) {
+  // 0.1 = tokenize + segmentation complete; skipped when the deck is empty
+  // (no blocks) so an empty parse reports only the final 1.0 (04-01, D-06).
+  if (blocks.length > 0) {
+    onProgress?.(0.1);
+  }
+
+  const total = Math.max(blocks.length, 1);
+  for (let i = 0; i < blocks.length; i++) {
+    const block = blocks[i];
     const key = canonicalizeCommand(block.name);
     const handler = resolveHandler(key);
     if (handler !== undefined) {
@@ -101,9 +119,14 @@ export function parseStaad(text: string): ParseResult {
         severity: 'warning',
       });
     }
+    // Per-block cadence 0.15→0.95 (D-06); the fraction is always a computed
+    // number from block count, never derived from input strings (T-04-02).
+    onProgress?.(0.15 + (i / total) * 0.8);
   }
 
-  return { model: finalize(ctx), warnings: ctx.warnings };
+  const result = { model: finalize(ctx), warnings: ctx.warnings };
+  onProgress?.(1.0);
+  return result;
 }
 
 export type {
