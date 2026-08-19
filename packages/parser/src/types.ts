@@ -189,6 +189,17 @@ export interface ParseResult {
 }
 
 /**
+ * D-06: optional progress signal fired by parseStaad's onProgress callback.
+ * `fraction` is always in [0,1] (0.1 after tokenize, 0.15→0.95 per block,
+ * 1.0 at finalize); `stage` is an optional human-readable label. Pure
+ * value contract — never captures DOM/postMessage/React (worker-safe).
+ */
+export interface ParseProgress {
+  fraction: number;
+  stage?: string;
+}
+
+/**
  * D-06/D-07: stable machine-readable warning codes.
  * Tests and UI assert on these — never rename or reorder. Covers: unknown
  * commands, skipped plates/solids, unresolved sections, malformed lines,

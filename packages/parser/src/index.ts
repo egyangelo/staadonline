@@ -119,6 +119,7 @@ export type {
   Member,
   Node,
   ParseResult,
+  ParseProgress,
   ParseWarning,
   SectionFamily,
   SectionMeta,
