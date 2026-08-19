@@ -17,7 +17,9 @@ export interface ModelStoreState {
   model: StaadModel | null;
   warnings: ParseWarning[];
   fileName: string | null;
+  progress: number | null;
   beginLoading: () => void;
+  setProgress: (progress: number) => void;
   setModel: (result: ParseResult, fileName: string) => void;
   setError: () => void;
 }
@@ -27,8 +29,11 @@ export const useModelStore = create<ModelStoreState>((set) => ({
   model: null,
   warnings: [],
   fileName: null,
+  progress: null,
 
-  beginLoading: () => set({ status: "loading" }),
+  beginLoading: () => set({ status: "loading", progress: null }),
+
+  setProgress: (progress) => set({ progress }),
 
   setModel: (result, fileName) =>
     set({
@@ -36,8 +41,9 @@ export const useModelStore = create<ModelStoreState>((set) => ({
       model: result.model,
       warnings: result.warnings,
       fileName,
+      progress: null,
     }),
 
   // Back to EMPTY without touching model/warnings (FILE-03).
-  setError: () => set({ status: "empty", fileName: null }),
+  setError: () => set({ status: "empty", fileName: null, progress: null }),
 }));
