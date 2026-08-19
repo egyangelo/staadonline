@@ -3,14 +3,24 @@
  * platform boundary). `File` is not constructible in node — readStdFile
  * paths use duck-typed File-shaped objects with a `text()` method.
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MAX_INPUT_LENGTH } from "@staad-online/parser";
+import { Capacitor } from "@capacitor/core";
 import {
   assertValidStdFile,
   FileServiceError,
+  readNativeFile,
   readStdFile,
 } from "./fileService";
 import type { FileServiceErrorCode, OpenedFile } from "./fileService";
+
+vi.mock("@capacitor/core", () => ({
+  Capacitor: {
+    convertFileSrc: vi.fn(
+      (path: string) => `http://localhost/_capacitor_file_/${path}`,
+    ),
+  },
+}));
 
 /** Minimal File-shaped fixture — no allocation for the huge-size case. */
 function fakeFile(
@@ -92,5 +102,78 @@ describe("readStdFile", () => {
     await expect(readStdFile(file)).rejects.toMatchObject({
       code: "WRONG_TYPE",
     });
+  });
+});
+
+describe("readNativeFile — native Capacitor branch (04-02, D-01/D-02, PLAT-03)", () => {
+  it("(1) web blob branch: resolves { name, text } matching the picked blob (no convertFileSrc/fetch)", async () => {
+    const picked = { name: "model.std", blob: new Blob(["STAAD SPACE"]) };
+    await expect(readNativeFile(picked)).resolves.toEqual({
+      name: "model.std",
+      text: "STAAD SPACE",
+    });
+  });
+
+  it("(2) cancel no-op: empty name / undefined resolve undefined (FILE-03 strict no-op)", async () => {
+    await expect(readNativeFile({ name: "" })).resolves.toBeUndefined();
+    await expect(readNativeFile(undefined as never)).resolves.toBeUndefined();
+  });
+
+  it("(3) WRONG_TYPE rejects before the blob is read", async () => {
+    const unreadableBlob = {
+      size: 10,
+      text: () => {
+        throw new Error("must not be read");
+      },
+    } as unknown as Blob;
+    await expect(
+      readNativeFile({ name: "notes.txt", blob: unreadableBlob }),
+    ).rejects.toMatchObject({ code: "WRONG_TYPE" });
+  });
+
+  it("(4) TOO_LARGE fires BEFORE text() — the blob's text() is never called", async () => {
+    const tooLargeBlob = {
+      size: MAX_INPUT_LENGTH + 1,
+      text: () => {
+        throw new Error("must not be read");
+      },
+    } as unknown as Blob;
+    await expect(
+      readNativeFile({ name: "big.std", blob: tooLargeBlob }),
+    ).rejects.toMatchObject({ code: "TOO_LARGE" });
+  });
+
+  it("(5) a blob whose text() rejects rejects with UNREADABLE", async () => {
+    const badBlob = {
+      size: 10,
+      text: () => Promise.reject(new Error("disk error")),
+    } as unknown as Blob;
+    await expect(
+      readNativeFile({ name: "model.std", blob: badBlob }),
+    ).rejects.toBeInstanceOf(FileServiceError);
+    await expect(
+      readNativeFile({ name: "model.std", blob: badBlob }),
+    ).rejects.toMatchObject({ code: "UNREADABLE" });
+  });
+
+  it("(6) native path: convertFileSrc → fetch blob — asserts both the resolved OpenedFile and the content URI", async () => {
+    const convertSpy = Capacitor.convertFileSrc as ReturnType<typeof vi.fn>;
+    convertSpy.mockClear();
+    const fetchMock = vi.fn(async () => ({
+      headers: { get: () => "16" },
+      blob: async () => new Blob(["STAAD SPACE"]),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    try {
+      const opened = await readNativeFile({
+        name: "model.std",
+        path: "content://x",
+      });
+      expect(convertSpy).toHaveBeenCalledWith("content://x");
+      expect(fetchMock).toHaveBeenCalled();
+      expect(opened).toEqual({ name: "model.std", text: "STAAD SPACE" });
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
