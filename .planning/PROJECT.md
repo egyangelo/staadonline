@@ -32,16 +32,17 @@ Open a STAAD `.std` file and see the 3D analytical model render correctly — on
 ### Validated
 
 - [x] App parses the STAAD input deck entirely in-browser (joints, members, properties, supports, loads) — Validated in Phase 1: Parser & Model
+- [x] Engineer can open a `.std` file via file picker or drag-and-drop — Validated in Phase 2: File Opening & 3D Rendering
+- [x] App renders the 3D analytical model procedurally (nodes + members as 3D shapes) — Validated in Phase 2: File Opening & 3D Rendering
+- [x] Engineer can color members by section, group, or material — Validated in Phase 3: Interaction & Visualization
+- [x] App displays supports and loads as 3D markers/arrows where defined — Validated in Phase 3: Interaction & Visualization
+- [x] Engineer can tap/click any member to inspect its section, group, length, and node coordinates — Validated in Phase 3: Interaction & Visualization
+- [x] App shows a model summary panel (units, member/joint counts, dimension bounds, groups) — Validated in Phase 3: Interaction & Visualization
+- [x] App is installable as a native Android app via Capacitor and works offline — Validated in Phase 4: Native Packaging & Performance (Android project + signed-build config wired; release APK/AAB build + on-device UAT pending Android SDK/device environment)
 
 ### Active
 
-- [ ] Engineer can open a `.std` file via file picker or drag-and-drop
-- [ ] App renders the 3D analytical model procedurally (nodes + members as 3D shapes)
-- [ ] Engineer can color members by section, group, or material
-- [ ] App displays supports and loads as 3D markers/arrows where defined
-- [ ] Engineer can tap/click any member to inspect its section, group, length, and node coordinates
-- [ ] App shows a model summary panel (units, member/joint counts, dimension bounds, groups)
-- [ ] App is installable as a native app on iOS and Android via Capacitor, and works offline on mobile and web
+- [ ] App is installable as a native app on iOS via Capacitor (Android shell built; iOS deferred to later milestone)
 
 ### Out of Scope
 
@@ -70,7 +71,7 @@ Open a STAAD `.std` file and see the 3D analytical model render correctly — on
 |----------|-----------|---------|
 | Parse `.std` in the browser, not on a server | Zero backend, zero accounts, files never leave the device; privacy is a differentiator | ✅ D-01: client-side only; `@staad-online/parser` (Phase 1) |
 | Render members as procedural shapes, not glTF | Analytical model is just nodes + members; simpler, faster, no pipeline machinery | — Pending |
-| Deliver as a Capacitor hybrid app (iOS/Android) with the same web codebase served in-browser | One codebase covers native stores, mobile, and web; offline by default from the bundled shell | — Pending |
+| Deliver as a Capacitor hybrid app (iOS/Android) with the same web codebase served in-browser | One codebase covers native stores, mobile, and web; offline by default from the bundled shell | ✅ Android shell + offline static export shipped (Phase 4); iOS deferred to later milestone |
 | Position as a public product | Targets all engineers with STAAD models, not just internal use | — Pending |
 
 ## Evolution
@@ -91,4 +92,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-16 after Phase 1 complete (Parser & Model) — `@staad-online/parser` parses real STAAD decks (joints, members, properties, supports, groups, loads) with golden-file verification*
+*Last updated: 2026-08-19 after Phase 4 complete (Native Packaging & Performance) — Capacitor Android shell, offline static export, streaming no-base64 native open, and worker-based parsing with progress. Signed release build + on-device UAT pending Android SDK/device environment.*
