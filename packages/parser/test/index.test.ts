@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_INPUT_LENGTH, parseStaad, registerParsingCommands } from '../src/index';
+import { MAX_INPUT_LENGTH, parseStaad, registerParsingCommands, type ParseProgress } from '../src/index';
 import { WARNING_CODES } from '../src/types';
 import { expected } from './fixtures/manifest';
 import { loadFixture } from './fixtures/loadFixture';
@@ -176,5 +176,15 @@ JOINT COORDINATES
     expect(result.warnings[0].line).toBe(0);
     // Empty model still carries P1 default units.
     expect(result.model.units.length).toBe('FT');
+  });
+});
+
+describe('ParseProgress contract export (04-01, D-06)', () => {
+  it('exports the optional progress contract with fraction required and stage optional', () => {
+    const progress: ParseProgress = { fraction: 0.5 };
+    expect(progress.fraction).toBe(0.5);
+    const staged: ParseProgress = { fraction: 1, stage: 'finalize' };
+    expect(staged.stage).toBe('finalize');
+    expect(staged.fraction).toBe(1);
   });
 });
