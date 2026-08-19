@@ -20,8 +20,9 @@
  * open during LOADING aborts the in-flight open before committing.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { parseStaad, registerParsingCommands } from "@staad-online/parser";
+import { registerParsingCommands } from "@staad-online/parser";
 import { FileServiceError, readStdFile } from "@/lib/fileService";
+import { parseModel } from "@/lib/parseModel";
 import { useModelStore } from "@/store/modelStore";
 import { useViewerStore } from "@/store/viewerStore";
 import { ViewerCanvas } from "@/components/ViewerCanvas";
@@ -47,6 +48,7 @@ const ERROR_CODE_MAP: Record<FileServiceError["code"], ErrorCode> = {
 
 export default function Home() {
   const status = useModelStore((s) => s.status);
+  const progress = useModelStore((s) => s.progress);
   const [error, setError] = useState<ErrorCode | null>(null);
   const [errorDetail, setErrorDetail] = useState<string | undefined>(undefined);
   const [dragOver, setDragOver] = useState(false);
@@ -63,7 +65,9 @@ export default function Home() {
     try {
       const { name, text } = await readStdFile(file);
       if (token !== openToken.current) return;
-      const result = parseStaad(text);
+      const result = await parseModel(text, (f) =>
+        useModelStore.getState().setProgress(f),
+      );
       if (token !== openToken.current) return;
       useModelStore.getState().setModel(result, name);
       // ERROR/EMPTY restore + markers default-on (03-09, T-03-01): reset the
@@ -173,7 +177,7 @@ export default function Home() {
         />
       )}
 
-      {loading && <LoadingOverlay />}
+      {loading && <LoadingOverlay fraction={progress} />}
     </div>
   );
 }
