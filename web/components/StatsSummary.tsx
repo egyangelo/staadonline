@@ -44,6 +44,10 @@ export function StatsSummary() {
     { label: "Load cases", value: model.loadCases.length },
     { label: "Groups", value: model.groups.size },
   ];
+  // Plates cell only for models that carry plate/shell elements (05-01).
+  if (summary.elements > 0) {
+    stats.push({ label: "Plates", value: summary.elements });
+  }
 
   const unitsLine = `${model.units.length} / ${model.units.force}`;
   const b = model.bounds;

@@ -28,6 +28,7 @@ export interface BoundingBoxRow {
 export interface SummaryData {
   nodes: number;
   members: number;
+  elements: number;
   sections: number;
   supports: number;
   loadCases: number;
@@ -64,6 +65,7 @@ export function buildSummaryData(model: StaadModel, warnings: ParseWarning[]): S
   return {
     nodes: model.nodes.length,
     members: model.members.length,
+    elements: model.elements.length,
     sections: model.sections.size,
     supports: model.supports.length,
     loadCases: model.loadCases.length,
