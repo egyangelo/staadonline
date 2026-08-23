@@ -64,38 +64,6 @@ export function StatsSummary() {
     >
       <div className={styles.header}>
         <span className={styles.title}>Model summary</span>
-        <div className={styles.headerControls}>
-          <button
-            type="button"
-            className={styles.detailsPill}
-            aria-expanded={expanded}
-            onClick={() => setExpanded((e) => !e)}
-          >
-            {expanded ? "Less" : "Details"}
-          </button>
-          <button
-            type="button"
-            className={styles.toggle}
-            aria-label={collapsed ? "Expand model summary" : "Collapse model summary"}
-            aria-expanded={!collapsed}
-            onClick={() => setCollapsed((c) => !c)}
-          >
-            <svg
-              className={`${styles.chevron} ${collapsed ? styles.chevronClosed : ""}`}
-              viewBox="0 0 20 20"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M5 12.5 10 7.5 15 12.5"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
       </div>
 
       {!collapsed && (
@@ -193,6 +161,41 @@ export function StatsSummary() {
           )}
         </div>
       )}
+
+      {/* Controls live in a footer pinned to the card's bottom edge so the
+          Details/collapse actions stay reachable without hunting the top. */}
+      <div className={styles.footer}>
+        <button
+          type="button"
+          className={styles.detailsPill}
+          aria-expanded={expanded}
+          onClick={() => setExpanded((e) => !e)}
+        >
+          {expanded ? "Less" : "Details"}
+        </button>
+        <button
+          type="button"
+          className={styles.toggle}
+          aria-label={collapsed ? "Expand model summary" : "Collapse model summary"}
+          aria-expanded={!collapsed}
+          onClick={() => setCollapsed((c) => !c)}
+        >
+          <svg
+            className={`${styles.chevron} ${collapsed ? styles.chevronClosed : ""}`}
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M5 12.5 10 7.5 15 12.5"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
     </aside>
   );
 }
