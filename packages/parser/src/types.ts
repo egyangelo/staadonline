@@ -147,6 +147,19 @@ export interface LoadCase {
   forceUnit?: UnitForce;
 }
 
+/**
+ * A plate/shell element (PLATE-01). STAAD shell quads carry four joint ids;
+ * triangles arrive as a quad with the last node repeated (j4 === j3).
+ */
+export interface Plate {
+  /** 1-based element number from the .std file (D-04 source of truth). */
+  id: number;
+  /** Exactly four joint ids; triangle = quad with the last node repeated. */
+  nodes: [number, number, number, number];
+  /** Thickness from ELEMENT PROPERTIES — present only when resolved (D-05-04). */
+  thickness?: number;
+}
+
 export interface Group {
   name: string;
   memberIds: number[];
@@ -173,6 +186,8 @@ export interface ParseWarning {
 export interface StaadModel {
   nodes: Node[];
   members: Member[];
+  /** Plate/shell elements (PLATE-01). */
+  elements: Plate[];
   /** Keyed by sectionKey (PRIS label or TABLE section name). */
   sections: Map<string, SectionProfile & SectionMeta>;
   supports: Support[];
