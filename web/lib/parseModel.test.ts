@@ -60,6 +60,7 @@ function sampleResult(): ParseResult {
     model: {
       nodes: [],
       members: [],
+        elements: [],
       sections: new Map(),
       supports: [],
       loadCases: [],

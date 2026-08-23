@@ -67,6 +67,11 @@ function SceneContents() {
   // 03-09: scene result + interaction layers (ColorLayer/PickingController/
   // MarkersLayer) are driven by the resolved SceneBuildResult.
   const [sceneResult, setSceneResult] = useState<SceneBuildResult | null>(null);
+  // Member meshes only — the plate surface mesh renders in the scene but
+  // stays out of the instance-color / picking path (PLATE-02).
+  const memberMeshes = sceneResult
+    ? sceneResult.meshes.filter((m): m is THREE.InstancedMesh => m instanceof THREE.InstancedMesh)
+    : [];
   const [supportObjects, setSupportObjects] = useState<THREE.Object3D[]>([]);
   const colorLayerRef = useRef<ColorLayerHandle | null>(null);
 
@@ -168,12 +173,12 @@ function SceneContents() {
         <>
           <ColorLayer
             ref={colorLayerRef}
-            meshes={sceneResult.meshes}
+            meshes={memberMeshes}
             instanceToMember={sceneResult.instanceToMember}
             theme={dark ? "dark" : "light"}
           />
           <PickingController
-            meshes={sceneResult.meshes}
+            meshes={memberMeshes}
             instanceToMember={sceneResult.instanceToMember}
             supportObjects={supportObjects}
             colorLayerRef={colorLayerRef}

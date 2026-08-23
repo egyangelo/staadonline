@@ -5,6 +5,7 @@ import { buildSummaryData } from "./summaryData";
 function baseModel(): StaadModel {
   return {
     nodes: [{ id: 1, x: 0, y: 0, z: 0 }, { id: 2, x: 10, y: 0, z: 0 }],
+    elements: [],
     members: [{ id: 1, startNode: 1, endNode: 2, sectionKey: "W10X30" }],
     sections: new Map([["W10X30", { label: "W10X30", points: [[0, 0]], approximate: false, family: "STEEL" }]]),
     supports: [{ nodeId: 1, type: "FIXED", releases: { FX: false, FY: false, FZ: false, MX: false, MY: false, MZ: false }, line: 20 }],

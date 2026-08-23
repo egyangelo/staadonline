@@ -23,6 +23,7 @@ function model(loadCases: LoadCase[]): StaadModel {
   return {
     nodes: [],
     members: [],
+        elements: [],
     sections: new Map(),
     supports: [],
     loadCases,

@@ -24,6 +24,7 @@ function miniModel(): StaadModel {
       { id: 1, x: 0, y: 0, z: 0 },
       { id: 2, x: 8, y: 0, z: 0 },
     ],
+    elements: [],
     members: [{ id: 1, startNode: 1, endNode: 2, sectionKey: "PRIS" }],
     sections: new Map(),
     supports,

@@ -23,6 +23,7 @@ function member(id: number, overrides: Partial<Member> = {}): Member {
 function model(members: Member[]): StaadModel {
   return {
     nodes: [],
+    elements: [],
     members,
     sections: new Map(),
     supports: [],

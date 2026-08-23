@@ -33,8 +33,8 @@ export interface RebaseResult {
 
 /** Result of a SceneBuilder.build() pass (REND-02). */
 export interface SceneBuildResult {
-  /** One InstancedMesh per distinct section profile. */
-  meshes: THREE.InstancedMesh[];
+  /** One InstancedMesh per distinct section profile + one merged plate Mesh. */
+  meshes: (THREE.InstancedMesh | THREE.Mesh)[];
   /** instanceId → memberId (parallel, REND-02 Pattern 2). */
   instanceToMember: Map<number, number>;
   /** memberId → instanceId (parallel, REND-02 Pattern 2). */
@@ -160,9 +160,10 @@ const UNIT_Z = new THREE.Vector3(0, 0, 1);
  * Imperative scene builder: one InstancedMesh per distinct section profile.
  */
 export class SceneBuilder {
-  private meshes: THREE.InstancedMesh[] = [];
+  private meshes: (THREE.InstancedMesh | THREE.Mesh)[] = [];
   private geometries: THREE.ExtrudeGeometry[] = [];
   private material: THREE.MeshStandardMaterial;
+  private plateMaterial: THREE.MeshStandardMaterial;
   private nodeById: Map<number, number> = new Map();
   private nodeCoords: Float64Array = new Float64Array(0);
   private instanceToMember: Map<number, number> = new Map();
@@ -172,6 +173,14 @@ export class SceneBuilder {
     this.material = new THREE.MeshStandardMaterial({
       flatShading: true,
       side: THREE.DoubleSide,
+    });
+    // Plate surfaces (05-01, D-05-02): double-sided, slightly transparent so
+    // interior members stay readable. Separate material — dispose hygiene.
+    this.plateMaterial = new THREE.MeshStandardMaterial({
+      flatShading: true,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.85,
     });
   }
 
@@ -204,7 +213,7 @@ export class SceneBuilder {
       profiles.set(key, await this.resolveProfile(model, key));
     }
 
-    const meshes: THREE.InstancedMesh[] = [];
+    const meshes: (THREE.InstancedMesh | THREE.Mesh)[] = [];
     const instanceToMember = new Map<number, number>();
     const memberToInstance = new Map<number, number>();
     let instanceId = 0;
@@ -236,6 +245,12 @@ export class SceneBuilder {
       mesh.computeBoundingSphere();
       meshes.push(mesh);
     }
+    const memberMeshCount = meshes.length;
+
+    // Plates (05-01, PLATE-02/D-05-02): ONE merged double-sided surface mesh
+    // for the whole model — no plate mesh at all for member-only decks.
+    const plateMesh = this.buildPlates(model, nodeCoords);
+    if (plateMesh) meshes.push(plateMesh);
 
     const rebaseB = rebasedBounds(Float64Array.from(nodeCoords), model.nodes.length);
     this.meshes = meshes;
@@ -247,8 +262,60 @@ export class SceneBuilder {
       instanceToMember,
       memberToInstance,
       rebasedBounds: rebaseB,
-      profileCount: meshes.length,
+      profileCount: memberMeshCount,
     };
+  }
+
+  /**
+   * Build the merged non-indexed plate surface mesh (D-05-02): two triangles
+   * per quad, positions from node coordinates looked up by joint id. Quads
+   * referencing unknown nodes are dropped defensively — never NaN into the
+   * position buffer (T-05-02). Returns null when the model has no plates.
+   * Plates ignore cross-section exaggeration (true-surface, D-05-03).
+   */
+  private buildPlates(model: StaadModel, nodeCoords: Float64Array): THREE.Mesh | null {
+    if (model.elements.length === 0) return null;
+
+    const coordOf = (jointId: number): [number, number, number] | null => {
+      const idx = this.nodeById.get(jointId);
+      if (idx === undefined) return null;
+      return [nodeCoords[idx * 3], nodeCoords[idx * 3 + 1], nodeCoords[idx * 3 + 2]];
+    };
+
+    // Two triangles (18 floats) per resolved quad; drop unresolved ones first
+    // so the buffer is sized from real data only (T-05-01/T-05-02).
+    const quads: [number, number, number, number][] = [];
+    for (const plate of model.elements) {
+      const [a, b, c, d] = plate.nodes;
+      if (
+        coordOf(a) !== null &&
+        coordOf(b) !== null &&
+        coordOf(c) !== null &&
+        coordOf(d) !== null
+      ) {
+        quads.push([a, b, c, d]);
+      }
+    }
+    if (quads.length === 0) return null;
+
+    const positions = new Float32Array(quads.length * 2 * 3 * 3);
+    let o = 0;
+    const push = (id: number): void => {
+      const p = coordOf(id)!;
+      positions[o++] = p[0];
+      positions[o++] = p[1];
+      positions[o++] = p[2];
+    };
+    for (const [a, b, c, d] of quads) {
+      push(a); push(b); push(c); // triangle 1
+      push(a); push(c); push(d); // triangle 2
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.computeVertexNormals();
+
+    return new THREE.Mesh(geometry, this.plateMaterial);
   }
 
   /**
@@ -269,6 +336,7 @@ export class SceneBuilder {
   dispose(): void {
     for (const mesh of this.meshes) mesh.geometry.dispose();
     this.material.dispose();
+    this.plateMaterial.dispose();
     this.reset();
   }
 

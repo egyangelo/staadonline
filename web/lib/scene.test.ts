@@ -144,7 +144,7 @@ describe("SceneBuilder (REND-02 instancing + D-04/D-06)", () => {
     const { nodeCoords } = rebaseModel(model);
     return builder.build(model, 15).then((result) => {
       const matrix = new THREE.Matrix4();
-      result.meshes[0].getMatrixAt(0, matrix);
+      (result.meshes[0] as THREE.InstancedMesh).getMatrixAt(0, matrix);
       const position = new THREE.Vector3().setFromMatrixPosition(matrix);
       // Member 1 starts at node 1 (index 0): rebased ≈ (-5, -5, -2.5).
       expect(position.x).toBeCloseTo(nodeCoords[0], 4);
