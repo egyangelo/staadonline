@@ -24,6 +24,10 @@ export interface ViewerStoreState {
   setExaggeration: (n: number) => void;
   plateThickness: boolean;
   setPlateThickness: (b: boolean) => void;
+  // Member rendering mode: true = real cross-section extrusion (default),
+  // false = slim centerline sticks (wireframe read of the structure).
+  memberExtrusion: boolean;
+  setMemberExtrusion: (b: boolean) => void;
 
   colorMode: ColorMode;
   setColorMode: (mode: ColorMode) => void;
@@ -55,6 +59,9 @@ export const useViewerStore = create<ViewerStoreState>((set) => ({
   // extrude each quad by its ELEMENT PROPERTIES thickness where resolved.
   plateThickness: false,
   setPlateThickness: (plateThickness) => set({ plateThickness }),
+
+  memberExtrusion: true,
+  setMemberExtrusion: (memberExtrusion) => set({ memberExtrusion }),
 
   colorMode: "section",
   setColorMode: (colorMode) => set({ colorMode }),

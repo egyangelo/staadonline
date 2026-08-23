@@ -35,6 +35,7 @@ import { ColorModeControl } from "@/components/ColorModeControl";
 import { LoadCaseSelector } from "@/components/LoadCaseSelector";
 import { MagnitudeLabelToggle } from "@/components/MagnitudeLabelToggle";
 import { PlateThicknessToggle } from "@/components/PlateThicknessToggle";
+import { MemberExtrusionToggle } from "@/components/MemberExtrusionToggle";
 import { LegendChip } from "@/components/LegendChip";
 import { InspectorPopover } from "@/components/InspectorPopover";
 import styles from "./viewer.module.css";
@@ -198,6 +199,7 @@ export default function Home() {
           <ColorModeControl />
           <div className={styles.loadToolbar}>
             <LoadCaseSelector />
+            <MemberExtrusionToggle />
             <MagnitudeLabelToggle />
             <PlateThicknessToggle />
             <LegendChip />

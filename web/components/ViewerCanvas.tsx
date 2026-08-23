@@ -56,6 +56,7 @@ function SceneContents() {
   const model = useModelStore((s) => s.model);
   const exaggeration = useViewerStore((s) => s.exaggeration);
   const plateThickness = useViewerStore((s) => s.plateThickness);
+  const memberExtrusion = useViewerStore((s) => s.memberExtrusion);
   const camera = useThree((s) => s.camera);
 
   const groupRef = useRef<THREE.Group>(null);
@@ -140,7 +141,7 @@ function SceneContents() {
     let alive = true;
 
     builder
-      .build(model, exaggerationRef.current, { plateThickness })
+      .build(model, exaggerationRef.current, { plateThickness, memberExtrusion })
       .then((result) => {
       if (!alive) return;
       if (groupRef.current) {
@@ -159,7 +160,7 @@ function SceneContents() {
       setSceneResult(null);
       setSupportObjects([]);
     };
-  }, [model, status, fitCamera, plateThickness]);
+  }, [model, status, fitCamera, plateThickness, memberExtrusion]);
 
   // Exaggeration change — geometry-scale reapply, never a rebuild (D-04).
   useEffect(() => {

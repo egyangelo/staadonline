@@ -20,7 +20,8 @@ import type { Bounds, Member, SectionProfile, StaadModel } from "@staad-online/p
 import { buildSectionGeometry, applyUniformScale } from "./sectionShape";
 import { upgradeProfile, nearestShape } from "./sectionDb";
 
-/** Section key assigned to members with no resolved profile (D-07 fallback). */
+/** Shared key when member extrusion is off — one slim centerline mesh. */
+const CENTERLINE_PROFILE = "__CENTERLINE__";
 export const UNRESOLVED_PROFILE = "UNRESOLVED";
 
 /** Result of a centroid rebase (REND-06). */
@@ -193,7 +194,7 @@ export class SceneBuilder {
   async build(
     model: StaadModel,
     exaggeration: number,
-    opts?: { plateThickness?: boolean },
+    opts?: { plateThickness?: boolean; memberExtrusion?: boolean },
   ): Promise<SceneBuildResult> {
     this.reset();
 
@@ -203,9 +204,13 @@ export class SceneBuilder {
     model.nodes.forEach((node, index) => this.nodeById.set(node.id, index));
 
     // Group members by section key; members with no key → UNRESOLVED profile.
+    // With memberExtrusion OFF, all members collapse into ONE centerline
+    // bucket rendered with a shared slim square — a wireframe read of the
+    // structure (quick task 20260823-member-extrusion-toggle).
     const byKey = new Map<string, Member[]>();
+    const centerline = opts?.memberExtrusion === false;
     for (const member of model.members) {
-      const key = member.sectionKey ?? UNRESOLVED_PROFILE;
+      const key = centerline ? CENTERLINE_PROFILE : member.sectionKey ?? UNRESOLVED_PROFILE;
       const bucket = byKey.get(key);
       if (bucket) bucket.push(member);
       else byKey.set(key, [member]);
@@ -214,6 +219,19 @@ export class SceneBuilder {
     // Resolve a section profile for every distinct key (async upgrade).
     const profiles = new Map<string, SectionProfile>();
     for (const key of byKey.keys()) {
+      if (centerline && key === CENTERLINE_PROFILE) {
+        profiles.set(key, {
+          label: "Centerline",
+          points: [
+            [-0.03, -0.03],
+            [0.03, -0.03],
+            [0.03, 0.03],
+            [-0.03, 0.03],
+          ],
+          approximate: true,
+        });
+        continue;
+      }
       profiles.set(key, await this.resolveProfile(model, key));
     }
 
