@@ -95,11 +95,22 @@ describe('ELEMENT PROPERTIES (PLATE-01/D-05-04)', () => {
     expect(result.model.elements.map((p) => p.thickness)).toEqual([0.35, 0.35]);
   });
 
-  it('(11) unresolvable property row (group ref) warns SKIPPED_ELEMENT once per row', () => {
+  it('(11) unresolvable property row (UNKNOWN group ref) warns SKIPPED_ELEMENT once per row', () => {
     const result = parseStaad(
-      'ELEMENT INCIDENCES\n1 1 2 3 4\nELEMENT PROPERTIES\n_RAFT THICKNESS 0.6\n',
+      'ELEMENT INCIDENCES\n1 1 2 3 4\nELEMENT PROPERTIES\n_NOPE THICKNESS 0.6\n',
     );
     expect(skippedWarnings(result.warnings)).toBe(1);
+    expect(result.model.elements[0].thickness).toBeUndefined();
+  });
+
+  it('(14) group-ref row applies thickness to every element of a defined group', () => {
+    const result = parseStaad(
+      'JOINT COORDINATES\n1 0 0 0\n2 1 0 0\n3 1 1 0\n4 0 1 0\n5 2 0 0\n6 2 1 0\n7 3 0 0\n8 3 1 0\n' +
+        'ELEMENT INCIDENCES\n1 1 2 3 4; 2 5 6 7 8;\n' +
+        'START GROUP DEFINITION\nELEMENT\n_RAFT 1 TO 2\nEND GROUP DEFINITION\n' +
+        'ELEMENT PROPERTY\n_RAFT THICKNESS 0.6\n',
+    );
+    expect(result.model.elements.map((p) => p.thickness)).toEqual([0.6, 0.6]);
   });
 
   it('(12) properties for an unknown element id are tolerated without throw', () => {

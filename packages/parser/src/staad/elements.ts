@@ -12,9 +12,9 @@
  *
  * ELEMENT PROPERTIES resolves `thickness` onto matching plates by element id
  * (D-05-04): simple per-id rows (`1 THICK 0.2`) and numeric list rows with a
- * trailing THICKNESS value (`1 TO 5 THICKNESS 0.3`) are expanded via the
- * bounded list helpers (LIST_HARD_CAP zip-bomb guard). Unresolvable forms
- * (group refs like `_RAFT THICKNESS 0.6`, missing keyword) warn
+ * trailing THICKNESS value (`1 TO 5 THICKNESS 0.3`), and single group-ref
+ * rows (`_RAFT THICKNESS 0.6` — resolved via ctx.groups' recorded
+ * elementIds) all apply thickness. Unresolvable forms warn
  * SKIPPED_ELEMENT once per row and change nothing.
  *
  * Headless + worker-ready: zero DOM/global access; never throws.
@@ -118,6 +118,19 @@ export function elementPropertiesHandler(ctx: ParseContext, block: CommandBlock)
     while (i < listTokens.length) {
       const len = listItemLength(listTokens, i);
       if (len === 0) {
+        // Group reference (e.g. `_RAFT THICKNESS 0.6`, the common real-deck
+        // form): resolve through ctx.groups' recorded elementIds instead of
+        // warning — groups.ts already collected them from the ELEMENT
+        // group section.
+        const token = listTokens[i];
+        if (len === 0 && i === 0 && listTokens.length === 1 && token.startsWith('_')) {
+          const group = ctx.groups.get(token);
+          if (group !== undefined && group.elementIds.length > 0) {
+            ids.push(...group.elementIds);
+            i += 1;
+            continue;
+          }
+        }
         valid = false; // group ref / garbage token inside the list
         break;
       }
