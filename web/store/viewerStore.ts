@@ -22,6 +22,8 @@ export type SelectedKind = "member" | "support";
 export interface ViewerStoreState {
   exaggeration: number;
   setExaggeration: (n: number) => void;
+  plateThickness: boolean;
+  setPlateThickness: (b: boolean) => void;
 
   colorMode: ColorMode;
   setColorMode: (mode: ColorMode) => void;
@@ -48,6 +50,11 @@ export const useViewerStore = create<ViewerStoreState>((set) => ({
   // removed; the setter stays for programmatic/scene plumbing.
   exaggeration: 1,
   setExaggeration: (exaggeration) => set({ exaggeration }),
+
+  // Plate rendering mode: false = zero-thickness surface (D-05-02), true =
+  // extrude each quad by its ELEMENT PROPERTIES thickness where resolved.
+  plateThickness: false,
+  setPlateThickness: (plateThickness) => set({ plateThickness }),
 
   colorMode: "section",
   setColorMode: (colorMode) => set({ colorMode }),

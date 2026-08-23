@@ -190,7 +190,11 @@ export class SceneBuilder {
    * parallel instance↔member maps. One InstancedMesh per distinct section
    * key (REND-02 / P4) — never one Mesh per member.
    */
-  async build(model: StaadModel, exaggeration: number): Promise<SceneBuildResult> {
+  async build(
+    model: StaadModel,
+    exaggeration: number,
+    opts?: { plateThickness?: boolean },
+  ): Promise<SceneBuildResult> {
     this.reset();
 
     const { origin, nodeCoords } = rebaseModel(model);
@@ -249,7 +253,9 @@ export class SceneBuilder {
 
     // Plates (05-01, PLATE-02/D-05-02): ONE merged double-sided surface mesh
     // for the whole model — no plate mesh at all for member-only decks.
-    const plateMesh = this.buildPlates(model, nodeCoords);
+    const plateMesh = this.buildPlates(model, nodeCoords, {
+      thickness: opts?.plateThickness === true,
+    });
     if (plateMesh) meshes.push(plateMesh);
 
     const rebaseB = rebasedBounds(Float64Array.from(nodeCoords), model.nodes.length);
@@ -273,7 +279,11 @@ export class SceneBuilder {
    * position buffer (T-05-02). Returns null when the model has no plates.
    * Plates ignore cross-section exaggeration (true-surface, D-05-03).
    */
-  private buildPlates(model: StaadModel, nodeCoords: Float64Array): THREE.Mesh | null {
+  private buildPlates(
+    model: StaadModel,
+    nodeCoords: Float64Array,
+    opts?: { thickness?: boolean },
+  ): THREE.Mesh | null {
     if (model.elements.length === 0) return null;
 
     const coordOf = (jointId: number): [number, number, number] | null => {
@@ -282,37 +292,73 @@ export class SceneBuilder {
       return [nodeCoords[idx * 3], nodeCoords[idx * 3 + 1], nodeCoords[idx * 3 + 2]];
     };
 
-    // Two triangles (18 floats) per resolved quad; drop unresolved ones first
-    // so the buffer is sized from real data only (T-05-01/T-05-02).
-    const quads: [number, number, number, number][] = [];
+    // Resolve quads first (drop unresolved ones so the buffer is sized from
+    // real data only — T-05-01/T-05-02), keeping each plate's thickness for
+    // the extruded mode.
+    const resolved: { pts: [number, number, number][]; thickness: number }[] = [];
     for (const plate of model.elements) {
-      const [a, b, c, d] = plate.nodes;
-      if (
-        coordOf(a) !== null &&
-        coordOf(b) !== null &&
-        coordOf(c) !== null &&
-        coordOf(d) !== null
-      ) {
-        quads.push([a, b, c, d]);
-      }
+      const pts = plate.nodes.map(coordOf);
+      if (pts.some((p) => p === null)) continue;
+      resolved.push({
+        pts: pts as [number, number, number][],
+        thickness: opts?.thickness ? Math.max(plate.thickness ?? 0, 0) : 0,
+      });
     }
-    if (quads.length === 0) return null;
+    if (resolved.length === 0) return null;
 
-    const positions = new Float32Array(quads.length * 2 * 3 * 3);
-    let o = 0;
-    const push = (id: number): void => {
-      const p = coordOf(id)!;
-      positions[o++] = p[0];
-      positions[o++] = p[1];
-      positions[o++] = p[2];
+    const positions: number[] = [];
+    const push = (p: [number, number, number]): void => {
+      positions.push(p[0], p[1], p[2]);
     };
-    for (const [a, b, c, d] of quads) {
-      push(a); push(b); push(c); // triangle 1
-      push(a); push(c); push(d); // triangle 2
+    const tri = (
+      p0: [number, number, number],
+      p1: [number, number, number],
+      p2: [number, number, number],
+    ): void => {
+      push(p0); push(p1); push(p2);
+    };
+
+    for (const { pts, thickness } of resolved) {
+      const [a, b, c, d] = pts;
+      if (thickness > 0) {
+        // Extruded prism (12 tris): offset ±h along the quad normal. A
+        // degenerate normal falls back to +Y so the buffer never gets NaN
+        // (T-05-02).
+        const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+        const ad = [d[0] - a[0], d[1] - a[1], d[2] - a[2]];
+        let n = [
+          ab[1] * ad[2] - ab[2] * ad[1],
+          ab[2] * ad[0] - ab[0] * ad[2],
+          ab[0] * ad[1] - ab[1] * ad[0],
+        ];
+        const len = Math.hypot(n[0], n[1], n[2]);
+        n = len > 1e-12 ? n.map((v) => (v / len) * (thickness / 2)) : [0, thickness / 2, 0];
+        const off = (p: [number, number, number]): [number, number, number] => [
+          p[0] - n[0], p[1] - n[1], p[2] - n[2],
+        ];
+        const lift = (p: [number, number, number]): [number, number, number] => [
+          p[0] + n[0], p[1] + n[1], p[2] + n[2],
+        ];
+        const b0 = off(a), b1 = off(b), b2 = off(c), b3 = off(d);
+        const t0 = lift(a), t1 = lift(b), t2 = lift(c), t3 = lift(d);
+        // top face
+        tri(t0, t1, t2); tri(t0, t2, t3);
+        // bottom face
+        tri(b0, b2, b1); tri(b0, b3, b2);
+        // side walls
+        tri(b0, b1, t1); tri(b0, t1, t0);
+        tri(b1, b2, t2); tri(b1, t2, t1);
+        tri(b2, b3, t3); tri(b2, t3, t2);
+        tri(b3, b0, t0); tri(b3, t0, t3);
+      } else {
+        // Zero-thickness surface (D-05-02): two triangles per quad.
+        tri(a, b, c);
+        tri(a, c, d);
+      }
     }
 
     const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
     geometry.computeVertexNormals();
 
     return new THREE.Mesh(geometry, this.plateMaterial);
