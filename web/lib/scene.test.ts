@@ -11,7 +11,7 @@ import {
   SceneBuilder,
   type SceneBuildResult,
 } from "./scene";
-import type { Bounds, Member, Node, StaadModel } from "@staad-online/parser";
+import type { Bounds, Member, Node, Plate, StaadModel } from "@staad-online/parser";
 
 function makeNode(id: number, x: number, y: number, z: number): Node {
   return { id, x, y, z };
@@ -47,6 +47,7 @@ function makeSurveyModel(): StaadModel {
   return {
     nodes,
     members,
+    elements: [],
     sections: sections as unknown as StaadModel["sections"],
     supports: [],
     loadCases: [],
@@ -190,6 +191,93 @@ describe("SceneBuilder (REND-02 instancing + D-04/D-06)", () => {
     return builder.build(model, 15).then((result) => {
       result.meshes.forEach((m) => attachment.add(m));
       expect(() => attachment.updateMatrixWorld(true)).not.toThrow();
+      builder.dispose();
+    });
+  });
+});
+
+describe("SceneBuilder plates (05-01, PLATE-02/D-05-02)", () => {
+  /** Model with one 4-node quad plate (unit square in the XZ plane). */
+  function makePlateModel(): StaadModel {
+    const model = makeSurveyModel();
+    model.members = [];
+    const plate: Plate = { id: 1, nodes: [1, 2, 3, 4], thickness: 0.2 };
+    const n = (
+      id: number,
+      x: number,
+      y: number,
+      z: number,
+    ): Node => ({ id, x, y, z });
+    model.nodes = [n(1, -1, 0, -1), n(2, 1, 0, -1), n(3, 1, 0, 1), n(4, -1, 0, 1)];
+    model.elements = [plate];
+    model.bounds = { min: [-1, 0, -1], max: [1, 0, 1] };
+    return model;
+  }
+
+  it("(16) a quad yields ONE merged mesh with 6 verts and DoubleSide material", () => {
+    const builder = new SceneBuilder();
+    return builder.build(makePlateModel(), 15).then((result) => {
+      expect(result.meshes.length).toBe(1);
+      expect(result.meshes[0].geometry.attributes.position.count).toBe(6);
+      const mat = result.meshes[0].material as THREE.MeshStandardMaterial;
+      expect(mat.side).toBe(THREE.DoubleSide);
+      expect(mat.transparent).toBe(true);
+      expect(mat.opacity).toBeCloseTo(0.85, 2);
+      builder.dispose();
+    });
+  });
+
+  it("(17) plate vertices come from node coordinates (rebased)", () => {
+    const builder = new SceneBuilder();
+    return builder.build(makePlateModel(), 15).then((result) => {
+      const pos = result.meshes[0].geometry.attributes.position
+        .array as Float32Array;
+      // All vertices lie on the rebased plane y ≈ 0.
+      for (let i = 1; i < pos.length; i += 3) {
+        expect(Math.abs(pos[i])).toBeLessThan(1e-5);
+      }
+      // Extent along X spans the full quad (−1..1 rebased).
+      const xs = Array.from(pos.filter((_, i) => i % 3 === 0));
+      expect(Math.min(...xs)).toBeCloseTo(-1, 4);
+      expect(Math.max(...xs)).toBeCloseTo(1, 4);
+      builder.dispose();
+    });
+  });
+
+  it("(18) quads referencing unknown joint ids are dropped defensively (T-05-02)", () => {
+    const builder = new SceneBuilder();
+    const model = makePlateModel();
+    model.elements = [{ id: 9, nodes: [1, 2, 3, 999] }];
+    return builder.build(model, 15).then((result) => {
+      expect(result.meshes.length).toBe(0);
+      builder.dispose();
+    });
+  });
+
+  it("(19) member-only models add no plate mesh", () => {
+    const builder = new SceneBuilder();
+    const model = makeSurveyModel(); // members only, elements: []
+    return builder.build(model, 15).then((result) => {
+      expect(result.meshes.length).toBe(1); // just the member InstancedMesh
+      result.meshes.forEach((m) =>
+        expect(m).toBeInstanceOf(THREE.InstancedMesh),
+      );
+      builder.dispose();
+    });
+  });
+
+  it("(20) exaggeration does not rescale the true-surface plate geometry (D-05-03)", () => {
+    const builder = new SceneBuilder();
+    return builder.build(makePlateModel(), 15).then((result) => {
+      const pos = result.meshes[0].geometry.attributes.position
+        .array as Float32Array;
+      const xs = pos.filter((_, i) => i % 3 === 0);
+      const beforeMin = Math.min(...xs);
+      builder.setExaggeration(30);
+      const after = result.meshes[0].geometry.attributes.position
+        .array as Float32Array;
+      const afterXs = after.filter((_, i) => i % 3 === 0);
+      expect(Math.min(...afterXs)).toBeCloseTo(beforeMin, 5);
       builder.dispose();
     });
   });
