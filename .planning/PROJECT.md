@@ -38,6 +38,7 @@ Open a STAAD `.std` file and see the 3D analytical model render correctly — on
 - [x] App displays supports and loads as 3D markers/arrows where defined — Validated in Phase 3: Interaction & Visualization
 - [x] Engineer can tap/click any member to inspect its section, group, length, and node coordinates — Validated in Phase 3: Interaction & Visualization
 - [x] App shows a model summary panel (units, member/joint counts, dimension bounds, groups) — Validated in Phase 3: Interaction & Visualization
+- [x] Plates/shells from ELEMENT INCIDENCES render as double-sided surfaces alongside members — Validated in Phase 5: Plate & Shell Rendering (PLATE-01..03; solids still deferred)
 - [x] App is installable as a native Android app via Capacitor and works offline — Validated in Phase 4: Native Packaging & Performance (Android project + signed-build config wired; release APK/AAB build + on-device UAT pending Android SDK/device environment)
 
 ### Active
@@ -92,4 +93,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-19 after Phase 4 complete (Native Packaging & Performance) — Capacitor Android shell, offline static export, streaming no-base64 native open, and worker-based parsing with progress. Signed release build + on-device UAT pending Android SDK/device environment.*
+*Last updated: 2026-08-23 after Phase 5 complete (Plate & Shell Rendering) — ELEMENT INCIDENCES/PROPERTIES parsed into typed plates, rendered as double-sided surfaces. Signed release build + on-device UAT still pending Android SDK/device environment.*
