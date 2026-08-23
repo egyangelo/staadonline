@@ -68,6 +68,12 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 - [x] **PERF-01**: Files above ~2 MB parse in a Web Worker off the main thread
 - [x] **PERF-02**: Parse shows progress feedback for large files
 
+### Plate & Shell Rendering (v1.1 — pulled forward from OUTP-02)
+
+- [ ] **PLATE-01**: Parser emits typed `Plate` records from ELEMENT INCIDENCES (element id + 4 joint ids + resolved thickness where defined)
+- [ ] **PLATE-02**: Viewer renders plates/shells as double-sided shaded surfaces alongside members, markers, and selection
+- [ ] **PLATE-03**: Element parsing stays tolerant — malformed/unsupported element forms warn (`SKIPPED_ELEMENT`) without crashing
+
 ## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -83,7 +89,7 @@ Deferred to future release. Tracked but not in current roadmap.
 ### Results and Formats
 
 - **OUTP-01**: `.OUT` results viewer (deformed shape, diagrams) — natural next milestone
-- **OUTP-02**: Plates/solids rendering (ELEMENT INCIDENCES SHELL)
+- **OUTP-02**: Plates/solids rendering (ELEMENT INCIDENCES SHELL) — plates pulled forward into Phase 5 (PLATE-01..03); solids remain deferred
 - **OUTP-03**: Additional model formats (`.e2k`, `.s2k`)
 
 ## Out of Scope
@@ -142,12 +148,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-03 | Phase 4 | Complete |
 | PERF-01 | Phase 4 | Complete |
 | PERF-02 | Phase 4 | Complete |
+| PLATE-01 | Phase 5 | Pending |
+| PLATE-02 | Phase 5 | Pending |
+| PLATE-03 | Phase 5 | Pending |
+| RESL-01 | v2 (deferred) | Deferred |
+| RESL-02 | v2 (deferred) | Deferred |
+| RESL-03 | v2 (deferred) | Deferred |
+| RESL-04 | v2 (deferred) | Deferred |
+| RESL-05 | v2 (deferred) | Deferred |
+| OUTP-01 | v2 (deferred) | Deferred |
+| OUTP-02 | Phase 5 (plates) / v2 (solids) | Partial |
+| OUTP-03 | v2 (deferred) | Deferred |
 
 **Coverage:**
 
-- v1 requirements: 34 total
-- Mapped to phases: 34 ✓
-- Unmapped: 0 ✓
+- v1 requirements: 34 total — mapped to phases: 34 ✓, unmapped: 0 ✓
+- v1.1 additions: 3 (PLATE-01..03 → Phase 5)
+- v2 deferred: tracked in traceability for completeness
 
 ---
 *Requirements defined: 2026-08-15*

@@ -103,16 +103,30 @@ Plans:
   4. Files above ~2 MB parse in a Web Worker off the main thread, keeping the UI responsive.
   5. Parse shows progress feedback for large files.
 
+**Plans**: 6/6 complete
+
+### Phase 5: Plate & Shell Rendering
+
+**Goal**: The viewer parses ELEMENT INCIDENCES / ELEMENT PROPERTIES into typed plate records and renders plates/shells as shaded double-sided surfaces alongside the member wireframe — closing the D-07 scope gap surfaced in the Phase 4 demo (938 skipped elements in HPP_Main_Building_2.std).
+**Depends on**: Phase 4
+**Requirements**: PLATE-01, PLATE-02, PLATE-03
+**Success Criteria** (what must be TRUE):
+
+  1. `parseStaad` emits typed `Plate` records for ELEMENT INCIDENCES quads (element id + 4 joint ids + resolved thickness where defined).
+  2. Plates render as double-sided shaded surfaces in the 3D scene, coexisting with member instanced meshes and markers.
+  3. Malformed or unsupported element forms still produce `SKIPPED_ELEMENT` warnings and never crash the parse (tolerance preserved).
+
 **Plans**: TBD
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Parser & Model | 9/9 | Complete    | 2026-08-16 |
-| 2. File Opening & 3D Rendering | TBD | Not started | - |
+| 2. File Opening & 3D Rendering | 7/7 | Complete | 2026-08-17 |
 | 3. Interaction & Visualization | 9/9 | Complete   | 2026-08-17 |
 | 4. Native Packaging & Performance | 6/6 | Complete    | 2026-08-19 |
+| 5. Plate & Shell Rendering | TBD | Not started | - |
