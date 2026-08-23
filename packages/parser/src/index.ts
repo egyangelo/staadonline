@@ -34,6 +34,7 @@ import './staad/member-property';
 import './staad/constants';
 import './staad/supports';
 import './staad/groups';
+import './staad/elements';
 import './staad/loads';
 import './staad/steel-resolver';
 import { registerSkippedCommands } from './staad/skipped';
@@ -59,6 +60,7 @@ function emptyModel(): StaadModel {
   return {
     nodes: [],
     members: [],
+    elements: [],
     sections: new Map(),
     supports: [],
     loadCases: [],
@@ -144,6 +146,7 @@ export type {
   ParseResult,
   ParseProgress,
   ParseWarning,
+  Plate,
   SectionFamily,
   SectionMeta,
   SectionProfile,

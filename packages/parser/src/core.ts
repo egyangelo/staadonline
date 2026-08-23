@@ -29,11 +29,12 @@ import type { Token, TokenizedLine } from './tokenizer';
 import { createUnitState } from './resolve-units';
 import type {
   Bounds,
-  Group,
-  LoadCase,
-  Member,
-  Node,
-  ParseWarning,
+   Group,
+   LoadCase,
+   Member,
+   Node,
+   ParseWarning,
+   Plate,
   SectionMeta,
   SectionProfile,
   StaadModel,
@@ -64,6 +65,8 @@ export interface ParseContext {
   nodes: Node[];
   /** Members. 1-based source ids (D-04). */
   members: Member[];
+  /** Plate/shell elements (05-01, PLATE-01). */
+  elements: Plate[];
   /** Resolved section profiles keyed by sectionKey (what the model exposes). */
   sections: Map<string, SectionProfile & SectionMeta>;
   /** Supports. */
@@ -236,6 +239,7 @@ export function createContext(): ParseContext {
     warnings: [],
     nodes: [],
     members: [],
+    elements: [],
     sections: new Map(),
     supports: [],
     loadCases: [],
@@ -299,6 +303,7 @@ export function finalize(ctx: ParseContext): StaadModel {
   return {
     nodes: ctx.nodes,
     members: ctx.members,
+    elements: ctx.elements,
     sections: ctx.sections,
     supports: ctx.supports,
     loadCases: ctx.loadCases,

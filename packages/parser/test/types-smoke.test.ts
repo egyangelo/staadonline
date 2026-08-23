@@ -100,6 +100,7 @@ describe('StaadModel shape (D-03)', () => {
         { id: 2, x: 5, y: 0, z: 0 },
       ],
       members: [{ id: 1, startNode: 1, endNode: 2, sectionKey: 'PRIS', group: 'G1', material: 'STEEL' }],
+      elements: [],
       sections: new Map([
         [
           'PRIS',
@@ -157,6 +158,7 @@ describe('StaadModel shape (D-03)', () => {
       model: {
         nodes: [],
         members: [],
+        elements: [],
         sections: new Map(),
         supports: [],
         loadCases: [],

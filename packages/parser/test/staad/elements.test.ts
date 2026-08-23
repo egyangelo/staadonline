@@ -60,7 +60,7 @@ describe('ELEMENT INCIDENCES (PLATE-01)', () => {
   });
 
   it('(6) malformed row (wrong arity) warns once, never throws', () => {
-    const result = parseStaad('ELEMENT INCIDENCES\n9 1 2 3\n');
+    const result = parseStaad('ELEMENT INCIDENCES\n9 1 2 3 4 5\n');
     expect(result.model.elements.length).toBe(0);
     expect(skippedWarnings(result.warnings)).toBe(1);
   });

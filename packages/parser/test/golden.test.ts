@@ -128,11 +128,13 @@ describe('golden: real HPP_Main_Building_2.std (tolerant tier, D-09)', () => {
   it('(8) warnings include SKIPPED_ELEMENT and UNRESOLVED_SECTION; bounds finite (P8)', () => {
     const text = loadFixture('real/HPP_Main_Building_2.std');
     const result = parseStaad(text);
-    // ELEMENT INCIDENCES SHELL at source line 375 → SKIPPED_ELEMENT (D-07),
-    // now realizable via the canonical skipped.ts registration (01-09).
+    // 05-01: ELEMENT INCIDENCES is parsed into typed plates (PLATE-01) —
+    // SKIPPED_ELEMENT remains for group refs / plate supports / unresolvable
+    // property rows, but no longer fires at the block header (line 375).
     const skipped = result.warnings.filter((w) => w.code === WARNING_CODES.SKIPPED_ELEMENT);
     expect(skipped.length).toBeGreaterThan(0);
-    expect(skipped.some((w) => w.line === 375)).toBe(true);
+    expect(skipped.every((w) => w.line !== 375)).toBe(true);
+    expect(result.model.elements).toHaveLength(expectedReal.elements);
     // TABLE sections → UNRESOLVED_SECTION (D-07, approximate fallback).
     expect(result.warnings.some((w) => w.code === WARNING_CODES.UNRESOLVED_SECTION)).toBe(true);
     // Bounds computed by finalize and finite on every axis (P8).

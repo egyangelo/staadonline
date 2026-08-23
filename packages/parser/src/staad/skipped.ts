@@ -13,12 +13,14 @@
  *   PERFORM ANALYSIS, PRINT, PAGE, INPUT WIDTH). The handler runs once on the
  *   block header; the body is already absorbed by segmentation (DEFINE /
  *   START scopes absorb their rows).
- * - SKIPPED_ELEMENT, warn once per block: plate/element blocks that the
- *   parser deliberately does not model (D-07) — ELEMENT INCIDENCES,
- *   ELEMENT PROPERTIES. NOTE (01-09 Rule 1): the key MUST be the canonical
- *   spelling — core.ts COMMAND_ALIASES maps PROPERTY → PROPERTIES before
- *   dispatch, so a raw 'ELEMENT PROPERTY' registration would never match a
- *   real header and the block would fall through to UNKNOWN_COMMAND.
+ * - SKIPPED_ELEMENT, warn once per row: plate/element rows the parser
+ *   deliberately does not model. NOTE (05-01): ELEMENT INCIDENCES and
+ *   ELEMENT PROPERTIES moved OUT of this list — they are parsed into typed
+ *   Plate records by staad/elements.ts (PLATE-01); the SKIPPED_ELEMENT code
+ *   is now emitted per-row from those handlers for non-clean forms.
+ *   The key MUST be canonical — core.ts COMMAND_ALIASES maps PROPERTY →
+ *   PROPERTIES before dispatch, so a raw 'ELEMENT PROPERTY' registration
+ *   would never match a real header.
  * - Silent no-ops: CHANGE (case bookkeeping) and FINISH (deck end). No
  *   warning — these are noise, not defects.
  *
@@ -90,8 +92,13 @@ const IGNORED = [
   'INPUT WIDTH',
 ];
 
-/** Skipped with a SKIPPED_ELEMENT warning (plate/element blocks, D-07). */
-const SKIPPED_ELEMENT_BLOCKS = ['ELEMENT INCIDENCES', 'ELEMENT PROPERTIES'];
+/**
+ * Skipped with a SKIPPED_ELEMENT warning. Empty since 05-01: ELEMENT
+ * INCIDENCES / ELEMENT PROPERTIES are parsed into typed plates
+ * (staad/elements.ts, PLATE-01) — kept so the tolerated-command registry
+ * stays a single source of truth.
+ */
+const SKIPPED_ELEMENT_BLOCKS: string[] = [];
 
 /** Silent no-ops (deck bookkeeping). */
 const SILENT = ['CHANGE', 'FINISH'];
