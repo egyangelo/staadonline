@@ -70,9 +70,9 @@ Requirements for milestone v1.0 (STAAD Online Viewer). Each maps to roadmap phas
 
 ### Plate & Shell Rendering (v1.1 — pulled forward from OUTP-02)
 
-- [ ] **PLATE-01**: Parser emits typed `Plate` records from ELEMENT INCIDENCES (element id + 4 joint ids + resolved thickness where defined)
-- [ ] **PLATE-02**: Viewer renders plates/shells as double-sided shaded surfaces alongside members, markers, and selection
-- [ ] **PLATE-03**: Element parsing stays tolerant — malformed/unsupported element forms warn (`SKIPPED_ELEMENT`) without crashing
+- [x] **PLATE-01**: Parser emits typed `Plate` records from ELEMENT INCIDENCES (element id + 4 joint ids + resolved thickness where defined)
+- [x] **PLATE-02**: Viewer renders plates/shells as double-sided shaded surfaces alongside members, markers, and selection
+- [x] **PLATE-03**: Element parsing stays tolerant — malformed/unsupported element forms warn (`SKIPPED_ELEMENT`) without crashing
 
 ## v2 Requirements
 
@@ -148,9 +148,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-03 | Phase 4 | Complete |
 | PERF-01 | Phase 4 | Complete |
 | PERF-02 | Phase 4 | Complete |
-| PLATE-01 | Phase 5 | Pending |
-| PLATE-02 | Phase 5 | Pending |
-| PLATE-03 | Phase 5 | Pending |
+| PLATE-01 | Phase 5 | Complete |
+| PLATE-02 | Phase 5 | Complete |
+| PLATE-03 | Phase 5 | Complete |
 | RESL-01 | v2 (deferred) | Deferred |
 | RESL-02 | v2 (deferred) | Deferred |
 | RESL-03 | v2 (deferred) | Deferred |
