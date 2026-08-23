@@ -44,7 +44,9 @@ export interface ViewerStoreState {
 }
 
 export const useViewerStore = create<ViewerStoreState>((set) => ({
-  exaggeration: 15,
+  // Cross-section exaggeration is fixed at true scale (1) — the UI slider was
+  // removed; the setter stays for programmatic/scene plumbing.
+  exaggeration: 1,
   setExaggeration: (exaggeration) => set({ exaggeration }),
 
   colorMode: "section",

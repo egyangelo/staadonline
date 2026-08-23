@@ -13,6 +13,8 @@
  * guards + FileServiceError codes; a typed error is re-thrown for the page's
  * ERROR_CODE_MAP — a raw DOM/plugin error is never rendered here.
  */
+import { useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
 import { FilePicker } from "@capawesome/capacitor-file-picker";
 import { FileServiceError, readNativeFile } from "@/lib/fileService";
 import styles from "./NativeOpenControl.module.css";
@@ -22,6 +24,16 @@ interface NativeOpenControlProps {
 }
 
 export function NativeOpenControl({ onOpen }: NativeOpenControlProps) {
+  // Web builds already have OpenControl (hidden <input type="file">); the
+  // Capacitor picker only works inside a native shell, so this control hides
+  // itself on web instead of rendering a second dead "Open STAAD File" button.
+  const [native, setNative] = useState(false);
+  useEffect(() => {
+    setNative(Capacitor.isNativePlatform());
+  }, []);
+
+  if (!native) return null;
+
   const open = async () => {
     try {
       const { files } = await FilePicker.pickFiles({

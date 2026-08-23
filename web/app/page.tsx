@@ -5,7 +5,7 @@
  *
  * Full-canvas 3D viewer with a minimal floating chrome cluster:
  *   - <ViewerCanvas /> (02-05) fixed full-viewport behind the chrome;
- *   - bottom-left cluster: OpenControl + ExaggerationSlider (02-06);
+ *   - bottom-left cluster: OpenControl + NativeOpenControl (native only);
  *   - StatsSummary (02-06) above the cluster;
  *   - ErrorToast bottom-center when a typed error is set;
  *   - LoadingOverlay (02-06) while status === 'loading'.
@@ -28,7 +28,6 @@ import { useViewerStore } from "@/store/viewerStore";
 import { ViewerCanvas } from "@/components/ViewerCanvas";
 import { OpenControl } from "@/components/OpenControl";
 import { NativeOpenControl } from "@/components/NativeOpenControl";
-import { ExaggerationSlider } from "@/components/ExaggerationSlider";
 import { StatsSummary } from "@/components/StatsSummary";
 import { ErrorToast, type ErrorCode } from "@/components/ErrorToast";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -209,7 +208,6 @@ export default function Home() {
       <div className={styles.cluster}>
         <OpenControl onOpen={openFile} />
         <NativeOpenControl onOpen={(opened) => void openNativeFile(opened)} />
-        <ExaggerationSlider />
       </div>
 
       {error && (
