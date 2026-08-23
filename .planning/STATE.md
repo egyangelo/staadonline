@@ -159,6 +159,12 @@ Items acknowledged and carried forward from previous milestone close:
 | Platform | iOS native packaging | Deferred to later milestone | 2026-08-15 |
 | Resilience | Persisted model restore, recent files, share-sheet open | v2 (REQUIREMENTS.md) | 2026-08-15 |
 
+## Quick Tasks Completed
+
+| Date | Task | Outcome |
+|------|------|---------|
+| 2026-08-23 | member-extrusion-toggle | "Profiles" pill toggles members between section extrusion and centerline sticks (`c5d992d`) |
+
 ## Session Continuity
 
 Last session: 2026-08-23T19:29:34.950Z
