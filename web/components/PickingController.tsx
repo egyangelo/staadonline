@@ -81,9 +81,24 @@ export function PickingController({
 
   const resolveMember = (intersection: THREE.Intersection): PickTarget => {
     const mesh = intersection.object as THREE.InstancedMesh;
-    const instanceId = intersection.instanceId ?? null;
-    const memberId = instanceId === null ? null : instanceToMember.get(instanceId) ?? null;
-    return { instanceId, memberId, supportNodeId: null };
+    const slot = intersection.instanceId ?? null;
+    if (slot === null) return { instanceId: null, memberId: null, supportNodeId: null };
+    // instanceToMember is keyed by GLOBAL index (running counter across meshes
+    // in array order — see SceneBuilder.build), while raycaster.instanceId is
+    // LOCAL to the hit mesh. Convert before lookup, or every section-mesh's
+    // slot N collides with the first mesh's slot N (wrong member inspector).
+    let offset = 0;
+    let globalIndex: number | null = null;
+    for (const m of meshes) {
+      if (m === mesh) {
+        globalIndex = offset + slot;
+        break;
+      }
+      offset += m.count;
+    }
+    if (globalIndex === null) return { instanceId: null, memberId: null, supportNodeId: null };
+    const memberId = instanceToMember.get(globalIndex) ?? null;
+    return { instanceId: globalIndex, memberId, supportNodeId: null };
   };
 
   const resolveSupport = (intersection: THREE.Intersection): PickTarget | null => {
