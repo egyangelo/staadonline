@@ -6,6 +6,9 @@ dist/
 .vercel
 out/
 
+# Local tool state
+.freebuff/
+
 # Android release signing secrets (T-04-21) — never commit
 *.jks
 keystore.properties
